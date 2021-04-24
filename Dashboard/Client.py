@@ -76,9 +76,12 @@ class Client(QtWidgets.QMainWindow):
         camera4 = QtWidgets.QLabel('Camera 4 ')
         alets = QtWidgets.QLabel('This is where alerts will be shown')
 
-        layout1 = QtWidgets.QFormLayout()
-        layout1.addRow(camera1, camera2)
-        layout1.addRow(camera3, camera4)
+        layout1 = QtWidgets.QGridLayout()
+        layout1.addWidget(camera1)
+        layout1.addWidget(camera2)
+        layout1.addWidget(camera3)
+        layout1.addWidget(camera4)
+
         camerawidget = QtWidgets.QWidget()
         camerawidget.setLayout(layout1)
 
