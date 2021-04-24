@@ -2,7 +2,6 @@
 
 from PySide6 import QtWidgets, QtGui, QtCore
 import sys
-import random
 
 
 # class MyWidget(QtWidgets.QWidget):
@@ -48,7 +47,7 @@ class Client(QtWidgets.QMainWindow):
     """
 
     def __init__(self):
-        super().__init__()
+        super(Client, self).__init__()
         self.initUI()
 
     """
@@ -67,20 +66,39 @@ class Client(QtWidgets.QMainWindow):
     def setGui(self):
         self.setWindowTitle('Vision Alarm')
         self.resize(1200, 800)
-        # To be developed
+        # Status Bar showing how many camera streaming **** To be developed
         self.statusBar().showMessage('Streaming on ')
         self.menuBar().addMenu('Add camera')
         self.menuBar().addMenu('Remove camera')
+        camera1 = self.streamCamera() # This function will stream live feeds from camera *** To be developed
+        camera2 = QtWidgets.QLabel('Camera 2 ')
+        camera3 = QtWidgets.QLabel('Camera 3 ')
+        camera4 = QtWidgets.QLabel('Camera 4 ')
+        alets = QtWidgets.QLabel('This is where alerts will be shown')
 
-        # dockWidget = QtWidgets.QDockWidget('Dock', self)
-        #
-        # dockWidget.setFloating(False)
-        # self.addDockWidget(self, Qt.RightDockWidgetArea, dockWidget)
+        layout1 = QtWidgets.QFormLayout()
+        layout1.addRow(camera1, camera2)
+        layout1.addRow(camera3, camera4)
+        camerawidget = QtWidgets.QWidget()
+        camerawidget.setLayout(layout1)
+
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(camerawidget)
+        layout.addWidget(alets)
+
+        widget = QtWidgets.QWidget()
+        widget.setLayout(layout)
+
+        self.setCentralWidget(widget)
+
+
+    def streamCamera(self):
+        return QtWidgets.QLabel('Camera 1 ')
 
 
 # Launching the client
 
-app = QtWidgets.QApplication()
+app = QtWidgets.QApplication(sys.argv)
 
 window = Client()
 window.show()
