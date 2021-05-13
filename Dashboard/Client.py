@@ -26,6 +26,30 @@ class MyGui(QtWidgets.QMainWindow):
         self.filterchains = []
         self.videoframes = []
 
+    def setcameralayout(self):
+        x = 0
+        y = 0
+        for j in range(4):
+
+            try:
+                address = self.addresses[j]
+            except:
+                address = None
+            if j > 1:
+                x = 1
+            if y > 1:
+                y = 0
+            if address:
+                fr = QtWidgets.QFrame(self.w)
+                print("setupUi: layout index, address : ", x, y, address)
+                self.lay.addWidget(fr, x, y)
+                self.videoframes.append((fr, address))
+            else:
+                fr = QtWidgets.QLabel(self.w)
+                fr.setText('Camera not connected')
+                self.lay.addWidget(fr, x, y)
+            y += 1
+
     def setupUi(self):
         self.setWindowTitle('Vision Alarm')
         self.resize(1200, 800)
@@ -41,47 +65,31 @@ class MyGui(QtWidgets.QMainWindow):
 
         self.lay = QtWidgets.QGridLayout(self.w)
 
-        # for i, address in enumerate(self.addresses):
-        #     fr = QtWidgets.QFrame(self.w)
-        #     print("setupUi: layout index, address : ", i // 4, i % 4, address)
-        #     self.lay.addWidget(fr, i // 4, i % 4)
-        #     self.videoframes.append((fr, address))  # list of (QFrame, address) pairs
-        fr = QtWidgets.QFrame(self.w)
-        self.lay.addWidget(fr, 0, 0)
-        self.videoframes.append((fr, "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp"))
-        fr2 = QtWidgets.QFrame(self.w)
-        self.lay.addWidget(fr2, 0, 1)
-        self.videoframes.append((fr2, "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp"))
-        fr3 = QtWidgets.QFrame(self.w)
-        self.lay.addWidget(fr3, 1, 0)
-        self.videoframes.append((fr3, "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp"))
-        fr4 = QtWidgets.QFrame(self.w)
-        self.lay.addWidget(fr4, 1, 1)
-        self.videoframes.append((fr4, "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp"))
+        self.setcameralayout()
+
 
         # Alerts
-        # alertwidget = QtWidgets.QPlainTextEdit(self.w)
-        #
-        # self.lay.addWidget(alertwidget, 2, 0)
+        alertwidget = QtWidgets.QLabel(self.w)
+        alertwidget.setText('Alert History')
+        self.lay.addWidget(alertwidget, 2, 0)
 
     def openValkka(self):
         """
         Filtergraph:
         (LiveThread:livethread) --> FilterChain --> {FifoFrameFilter:gl_in_gilter} --> [OpenGLFrameFifo:gl_fifo] -->> (OpenGLThread:glthread)
 
-        See "single_stream_rtsp.py" for more details !
         """
-        self.gl_ctx = OpenGLFrameFifoContext();
-        self.gl_ctx.n_720p = 200;
-        self.gl_ctx.n_1080p = 200;
-        self.gl_ctx.n_1440p = 200;
-        self.gl_ctx.n_4K = 200;
-        self.gl_ctx.n_setup = 200;
-        self.gl_ctx.n_signal = 200;
-        self.gl_ctx.flush_when_full = False;
+        self.gl_ctx = OpenGLFrameFifoContext()
+        self.gl_ctx.n_720p = 200
+        self.gl_ctx.n_1080p = 200
+        self.gl_ctx.n_1440p = 200
+        self.gl_ctx.n_4K = 200
+        self.gl_ctx.n_setup = 200
+        self.gl_ctx.n_signal = 200
+        self.gl_ctx.flush_when_full = False
 
-        self.glthread = OpenGLThread("glthread", self.gl_ctx);
-        self.gl_in_filter = self.glthread.getFrameFilter();
+        self.glthread = OpenGLThread("glthread", self.gl_ctx)
+        self.gl_in_filter = self.glthread.getFrameFilter()
         self.livethread = LiveThread("livethread")
 
         # Start threads
@@ -131,7 +139,6 @@ class MyGui(QtWidgets.QMainWindow):
 def main():
     app = QtWidgets.QApplication(["multiple_stream_test"])
     mg = MyGui(addresses=["rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp",
-                          "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp",
                           "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp",
                           "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp"])
     mg.show()
