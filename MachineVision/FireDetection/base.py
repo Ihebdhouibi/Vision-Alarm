@@ -6,7 +6,7 @@ import numpy as np
 from valkka.api2.logging import  setValkkaLogLevel, loglevel_silent, loglevel_normal
 
 
-# setValkkaLogLevel(loglevel_silent)
+setValkkaLogLevel(loglevel_silent)
 
 
 image_interval = 1000
@@ -35,7 +35,7 @@ av_thread = AVThread("av_thread", fork_filter)
 av_in_filter = av_thread.getFrameFilter()
 live_thread = LiveThread("live_thread")
 
-ctx = LiveConnectionContext(LiveConnectionType_rtsp, "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp", 1,
+ctx = LiveConnectionContext(LiveConnectionType_rtsp, "rtsp://iheb:iheb@192.168.43.1:8080/h264_ulaw.sdp", 1,
                             av_in_filter)
 
 glthread.startCall()
@@ -61,8 +61,8 @@ context_id = glthread.newRenderContextCall(1, window_id, 0)
 # glthread.stopCall()
 
 
-width2 = 1920 // 4
-height2 = 1080 // 4
+width2 = 1920
+height2 = 1080
 
 shmem_name2 = "lesson_4"
 shmem_buffers2 = 10
@@ -88,14 +88,14 @@ while True:
     # print('slot ', meta.slot)
     # print('time ', meta.mstimestamp)
     img = data.reshape((meta.height, meta.width, 3))
-    img = cv2.GaussianBlur(img, (5, 5), 0)
+    # img = cv2.GaussianBlur(img, (5, 5), 0)
 
     # convert frame to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # Define mask
     lower_mask_value = [18, 50, 50]
-    upper_mask_value = [35, 255, 255]
+    upper_mask_value = [50, 255, 255]
 
     lower_mask_value = np.array(lower_mask_value, dtype='uint8')
     upper_mask_value = np.array(upper_mask_value, dtype='uint8')
@@ -107,10 +107,11 @@ while True:
     # total_number is the total number of non zero pixels
     total_number = cv2.countNonZero(mask)
 
-    if int(total_number) > 400:
+    if int(total_number) > 500:
         print('fire detected')
 
-    cv2.imshow('img', output)
+    cv2.imshow('Frame', img)
+    cv2.imshow('Frame masked', output)
     cv2.waitKey(10)
     # window_id2 = glthread.createWindow()
     # glthread.newRenderGroupCall(window_id2)

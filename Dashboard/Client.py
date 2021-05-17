@@ -67,18 +67,13 @@ class MyGui(QtWidgets.QMainWindow):
 
         self.setcameralayout()
 
-
         # Alerts
         alertwidget = QtWidgets.QLabel(self.w)
         alertwidget.setText('Alert History')
         self.lay.addWidget(alertwidget, 2, 0)
 
     def openValkka(self):
-        """
-        Filtergraph:
-        (LiveThread:livethread) --> FilterChain --> {FifoFrameFilter:gl_in_gilter} --> [OpenGLFrameFifo:gl_fifo] -->> (OpenGLThread:glthread)
 
-        """
         self.gl_ctx = OpenGLFrameFifoContext()
         self.gl_ctx.n_720p = 200
         self.gl_ctx.n_1080p = 200
@@ -138,9 +133,8 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["multiple_stream_test"])
-    mg = MyGui(addresses=["rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp",
-                          "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp",
-                          "rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp"])
+    mg = MyGui(addresses=["rtsp://iheb:iheb@192.168.43.1:8080/h264_ulaw.sdp",
+                          "rtsp://firas:firas@192.168.1.20:8080/h264_ulaw.sdp"])
     mg.show()
     app.exec_()
 
