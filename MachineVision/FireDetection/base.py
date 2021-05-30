@@ -43,15 +43,16 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
         # self.analyzer = MovementDetector(treshold=0.0001)# To be changed
 
     def cycle_(self):
+        # print('inside FireDetectorProcess')
         if self.client is None:
             time.sleep(1.0)
         else:
             index, isize = self.client.pull()
             if (index is None):
-                # print(self.pre, "Client timed out..")
+                print(self.pre, "Client timed out..")
                 pass
             else:
-                # print("Client index, size =", index, isize)
+                print("Client index, size =", index, isize)
                 data = self.client.shmem_list[index]
                 try:
                     img = data.reshape(
@@ -71,10 +72,10 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 # cv2.imshow('image', img)
 
                 # lets apply blur to reduce noise
-                imgBlurred = cv2.GaussianBlur(img, (5, 5), 0)
+                # imgBlurred = cv2.GaussianBlur(img, (5, 5), 0)
 
                 # Lets convert the image to HSV
-                imgHSV = cv2.cvtColor(imgBlurred, cv2.COLOR_BGR2HSV)
+                imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
                 # Define the mask
                 lower_mask_value = [18, 50, 50]
@@ -88,9 +89,10 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 # Count the total number of red pixels ; total number of non zero pixels
                 total_number = cv2.countNonZero(mask)
                 # print(type(total_number))
-
-                if int(total_number) > 500:
+                print(int(total_number))
+                if int(total_number) > 200:
                     print('Fire detected ')
+                    self.sendSignal_(name="Fire_detected")
                     # pass
 
 
@@ -103,3 +105,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
     def stop_move(self):
         print(self.pre, "At frontend: movement stopped")
         self.signals.stop_move.emit()
+
+    def Fire_detected(self):
+        print("At frontend: fire detected")
+        self.signals.Fire_detected.emit()

@@ -61,16 +61,6 @@ class MyGui(QtWidgets.QMainWindow):
         self.mainlay.addWidget(self.w, 75)
         self.mainlay.addWidget(self.alert, 25)
 
-        # # Video frames
-        # self.camframes = QtWidgets.QWidget()
-        # self.cameraframes_layout = QtWidgets.QGridLayout(self.camframes)
-        #
-        # # Alerts
-        # self.alerts = QtWidgets.QLabel('shit wtf is happening ')
-        #
-        # self.lay.addWidget(self.camframes)
-        # self.lay.addWidget(self.alerts)
-
         self.frames = []  # i currently don't know what it is used for
         self.addresses = self.pardic["cams"]
         print(self.addresses)
@@ -171,10 +161,12 @@ class MyGui(QtWidgets.QMainWindow):
             token = self.openglthread.connect(slot=cs, window_id=win_id)
             tokens.append(token)
 
-            # take corresponding analyzer multiprocess
+            # take corresponding multiprocess
             process = self.processes[cc]
             process.createClient()  # creates the shared memory client at the multiprocess
             # connect signals to the nested widget
+
+            process.signals.Fire_detected.connect(self.addAlert)
             # process.signals.start_move.connect() To be replaced with add_alert slot
             # process.signals.stop_move.connect() To be replaced with add_alert slot
 
@@ -211,10 +203,16 @@ class MyGui(QtWidgets.QMainWindow):
         self.closeValkka()
         super().closeEvent()
 
+    # Slot
+    def addAlert(self):
+        print('inside addAlert ')
+        self.alert.append('Fire Detected ')
+        pass
+
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp",
+    pardic = {"cams": ["rtsp://cam:cam@192.168.1.12:8080/h264_ulaw.sdp",
                        "rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp",
                        "rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
