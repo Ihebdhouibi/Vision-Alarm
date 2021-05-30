@@ -8,8 +8,9 @@ from MachineVision.FireDetection import QValkkaFireDetectorProcess
 from multiprocess import QValkkaThread
 from Streaming.Filterchain import WidgetPair, TestWidget0
 
-
 setValkkaLogLevel(loglevel_silent)
+
+
 class MyGui(QtWidgets.QMainWindow):
     class QtFrame:
 
@@ -45,9 +46,20 @@ class MyGui(QtWidgets.QMainWindow):
         self.menuBar().addMenu('Add Camera')
         self.menuBar().addMenu('Remove camera')
 
+        self.main = QtWidgets.QWidget(self)
+        self.setCentralWidget(self.main)
         self.w = QtWidgets.QWidget(self)
-        self.setCentralWidget(self.w)
-        self.lay = QtWidgets.QGridLayout(self.w)
+        # self.setCentralWidget(self.w)
+
+        self.mainlay = QtWidgets.QVBoxLayout(self.main)
+        self.mainlay.setSpacing(0)
+        self.mainlay.setContentsMargins(0, 0, 0, 0)
+
+        self.wlay = QtWidgets.QGridLayout(self.w)
+        self.alert = QtWidgets.QTextEdit()
+
+        self.mainlay.addWidget(self.w, 75)
+        self.mainlay.addWidget(self.alert, 25)
 
         # # Video frames
         # self.camframes = QtWidgets.QWidget()
@@ -154,7 +166,7 @@ class MyGui(QtWidgets.QMainWindow):
             if y > 1:
                 x = 1
                 y = 0
-            self.lay.addWidget(frame.widget, x, y)
+            self.wlay.addWidget(frame.widget, x, y)
             y += 1
             token = self.openglthread.connect(slot=cs, window_id=win_id)
             tokens.append(token)
@@ -202,9 +214,9 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp",
+    pardic = {"cams": ["rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp",
                        "rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp"],
+                       "rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}
