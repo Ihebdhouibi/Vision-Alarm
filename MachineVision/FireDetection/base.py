@@ -6,7 +6,6 @@ import numpy as np
 
 
 class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
-    # pass
     incoming_signal_defs = {  # each key corresponds to a front- and backend methods
         "create_client_": [],
         "test_": {"test_int": int, "test_str": str},
@@ -49,7 +48,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
         else:
             index, isize = self.client.pull()
             if (index is None):
-                print(self.pre, "Client timed out..")
+                # print(self.pre, "Client timed out..")
                 pass
             else:
                 print("Client index, size =", index, isize)
@@ -69,8 +68,9 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 #         self.sendSignal_(name="start_move")
                 #     elif (result == MovementDetector.state_stop):
                 #         self.sendSignal_(name="stop_move")
-                # cv2.imshow('image', img)
 
+                cv2.imshow('image', img)
+                cv2.waitKey(10)
                 # lets apply blur to reduce noise
                 # imgBlurred = cv2.GaussianBlur(img, (5, 5), 0)
 

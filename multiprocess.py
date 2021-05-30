@@ -191,10 +191,10 @@ class QValkkaOpenCVProcess(ValkkaProcess):
                 img = data.reshape(
                     (self.image_dimensions[1], self.image_dimensions[0], 3))
                 """ # WARNING: the x-server doesn't like this, i.e., we're creating a window from a separate python multiprocess, so the program will crash
-                print(self.pre,"Visualizing with OpenCV")
-                cv2.imshow("openCV_window",img)
+                print(self.pre,"Visualizing with OpenCV") """
+                cv2.imshow("openCV_window", img)
                 cv2.waitKey(1)
-                """
+
                 print(self.pre, ">>>", data[0:10])
 
                 # res=self.analyzer(img) # does something .. returns something ..
@@ -210,6 +210,7 @@ class QValkkaOpenCVProcess(ValkkaProcess):
         self.running = False
 
     def create_client_(self):
+        # print("inside create_client of multiprocess \n shmem name is {} for process number ".format(self.shmem_name))
         self.client = ShmemRGBClient(
             name=self.shmem_name,
             n_ringbuffer=self.n_buffer,  # size of ring buffer

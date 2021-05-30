@@ -75,6 +75,7 @@ class MyGui(QtWidgets.QMainWindow):
         self.processes = []
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
+            print("shmem name is {} for process number {} ".format(shmem_name, cs))
             process = QValkkaFireDetectorProcess(
                 "process" + str(cs),
                 shmem_name=shmem_name,
@@ -102,10 +103,10 @@ class MyGui(QtWidgets.QMainWindow):
         self.openglthread = OpenGLThread(
             name="mythread",
             # reserve stacks of YUV video frames for various resolutions
-            n_720p=10,
-            n_1080p=10,
-            n_1440p=10,
-            n_4K=10,
+            n_720p=50,
+            n_1080p=50,
+            n_1440p=50,
+            n_4K=50,
             verbose=False,
             msbuftime=100,
             affinity=-1
@@ -206,7 +207,7 @@ class MyGui(QtWidgets.QMainWindow):
     # Slot
     def addAlert(self):
         print('inside addAlert ')
-        self.alert.append('Fire Detected ')
+        self.alert.append('Fire Detected on camera number ')
         pass
 
 
