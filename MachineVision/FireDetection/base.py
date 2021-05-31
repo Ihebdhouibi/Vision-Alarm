@@ -15,9 +15,9 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
     outgoing_signal_defs = {
         "pong_o": {"message": str},
-        # "start_move": {},
-        "Fire_detected": {}
-        # "stop_move": {}
+        "start_move": {},
+        "Fire_detected": {},
+        "stop_move": {}
     }
 
     # For each outgoing signal, create a Qt signal with the same name.  The
@@ -27,9 +27,9 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
         # PySide2 version:
         pong_o = QtCore.Signal(object)
-        # start_move = QtCore.Signal()
+        start_move = QtCore.Signal()
         Fire_detected = QtCore.Signal()
-        # stop_move = QtCore.Signal()
+        stop_move = QtCore.Signal()
 
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)  # does parameterInitCheck
@@ -52,13 +52,17 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 pass
             else:
                 print("Client index, size =", index, isize)
-                data = self.client.shmem_list[index]
+                try:
+                    data = self.client.shmem_list[index]
+                    print(data)
+                except BaseException:
+                    print("There is an issue in getting data from shmem_list")
                 try:
                     img = data.reshape(
                         (self.image_dimensions[1], self.image_dimensions[0], 3))
                 except BaseException:
                     print("QValkkaMovementDetectorProcess: WARNING: could not reshape image")
-                    pass
+
                 # else:
                 #     result = self.analyzer(img)
                 #     # print(self.pre,">>>",data[0:10])
@@ -69,8 +73,8 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 #     elif (result == MovementDetector.state_stop):
                 #         self.sendSignal_(name="stop_move")
 
-                cv2.imshow('image', img)
-                cv2.waitKey(10)
+                # cv2.imshow('image', img)
+                # cv2.waitKey(10)
                 # lets apply blur to reduce noise
                 # imgBlurred = cv2.GaussianBlur(img, (5, 5), 0)
 
@@ -88,7 +92,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
                 # Count the total number of red pixels ; total number of non zero pixels
                 total_number = cv2.countNonZero(mask)
-                # print(type(total_number))
+                print('total number : ', int(total_number))
                 print(int(total_number))
                 if int(total_number) > 200:
                     print('Fire detected ')

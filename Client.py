@@ -69,7 +69,7 @@ class MyGui(QtWidgets.QMainWindow):
 
         shmem_image_dimensions = (1920 // 4, 1080 // 4)
         shmem_image_interval = 1000
-        shmem_rignbuffer_size = 10
+        shmem_rignbuffer_size = 100
 
         cs = 1
         self.processes = []
@@ -213,7 +213,7 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://cam:cam@192.168.1.12:8080/h264_ulaw.sdp",
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.43.1:8080/h264_ulaw.sdp",
                        "rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp",
                        "rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
