@@ -6,6 +6,9 @@ import numpy as np
 
 
 class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
+    fireDetected = False
+    fdetect = 0
+
     incoming_signal_defs = {  # each key corresponds to a front- and backend methods
         "create_client_": [],
         "test_": {"test_int": int, "test_str": str},
@@ -34,12 +37,14 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)  # does parameterInitCheck
         self.signals = self.Signals()
-        self.fireDetected = False
-
 
         # # parameterInitCheck(QValkkaMovementDetectorProcess.parameter_defs, kwargs, self)
         # self.analyzer=MovementDetector(verbose=True)
         # self.analyzer = MovementDetector(treshold=0.0001)# To be changed
+
+    def alarm(self):
+        print('Fire detected')
+        self.sendSignal_(name="Fire_detected")
 
     def cycle_(self):
         # print('inside FireDetectorProcess')
@@ -54,7 +59,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 print("Client index, size =", index, isize)
                 try:
                     data = self.client.shmem_list[index]
-                    print(data)
+                    # print(data)
                 except BaseException:
                     print("There is an issue in getting data from shmem_list")
                 try:
@@ -93,23 +98,26 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 # Count the total number of red pixels ; total number of non zero pixels
                 total_number = cv2.countNonZero(mask)
                 print('total number : ', int(total_number))
-                print(int(total_number))
-                if int(total_number) > 200:
-                    print('Fire detected ')
-                    self.sendSignal_(name="Fire_detected")
-                    # pass
 
+                print(' fireDetected :', self.fireDetected)
+                print(' fdetect : ', self.fdetect)
+                if int(total_number) > 1000:
+                    self.fdetect += 1
+
+                    if self.fdetect >= 1:
+                        if self.fireDetected is False:
+                            print('Fire detected')
+                            self.sendSignal_(name="Fire_detected")
+                            self.fireDetected = True
+                            print(' fireDetected :', self.fireDetected)
+                            print(' fdetect : ', self.fdetect)
+                    # pass
+                else:
+                    self.fireDetected = False
+                    self.fdetect = 0
 
     # ** frontend methods handling received outgoing signals ***
 
-    def start_move(self):
-        print(self.pre, "At frontend: got movement")
-        self.signals.start_move.emit()
-
-    def stop_move(self):
-        print(self.pre, "At frontend: movement stopped")
-        self.signals.stop_move.emit()
-
     def Fire_detected(self):
-        print("At frontend: fire detected")
+        print("At frontend: fire detected ")
         self.signals.Fire_detected.emit()

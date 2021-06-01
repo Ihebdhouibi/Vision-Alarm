@@ -72,10 +72,11 @@ class MyGui(QtWidgets.QMainWindow):
         shmem_rignbuffer_size = 100
 
         cs = 1
+        cc = 1
         self.processes = []
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
-            print("shmem name is {} for process number {} ".format(shmem_name, cs))
+            print("shmem name is {} for process number {} ".format(shmem_name, cc))
             process = QValkkaFireDetectorProcess(
                 "process" + str(cs),
                 shmem_name=shmem_name,
@@ -83,8 +84,8 @@ class MyGui(QtWidgets.QMainWindow):
                 image_dimensions=shmem_image_dimensions
             )
             self.processes.append(process)
-
-        # print(self.processes)
+            cs += 1
+        print(self.processes)
 
         # Give the multiprocesses to a gthread that's reading their message / thread will be listening to the processes !?
 
@@ -148,8 +149,7 @@ class MyGui(QtWidgets.QMainWindow):
 
             )
             self.chains.append(chain)
-            # frame = self.QtFrame(self.camframes)
-            # win_id = frame.getWindowId()
+
             win_id = self.openglthread.createWindow(show=False)
             frame = self.QtFrame(self.w, win_id)
 
@@ -168,8 +168,6 @@ class MyGui(QtWidgets.QMainWindow):
             # connect signals to the nested widget
 
             process.signals.Fire_detected.connect(self.addAlert)
-            # process.signals.start_move.connect() To be replaced with add_alert slot
-            # process.signals.stop_move.connect() To be replaced with add_alert slot
 
             chain.decodingOn()  # start the decoding thread
             cs += 1
@@ -207,15 +205,16 @@ class MyGui(QtWidgets.QMainWindow):
     # Slot
     def addAlert(self):
         print('inside addAlert ')
-        self.alert.append('Fire Detected on camera number ')
+        self.alert.append('Fire Detected on camera number 1')
         pass
 
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.43.1:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp",
-                       "rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp",
+                       "rtsp://iheb:iheb@192.168.1.14:8080/h264_ulaw.sdp",
+                       "rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp",
+                       "rtsp://iheb:iheb@192.168.1.29:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}
