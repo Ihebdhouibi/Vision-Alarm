@@ -68,20 +68,10 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 except BaseException:
                     print("QValkkaMovementDetectorProcess: WARNING: could not reshape image")
 
-                # else:
-                #     result = self.analyzer(img)
-                #     # print(self.pre,">>>",data[0:10])
-                #     if (result == MovementDetector.state_same):
-                #         pass
-                #     elif (result == MovementDetector.state_start):
-                #         self.sendSignal_(name="start_move")
-                #     elif (result == MovementDetector.state_stop):
-                #         self.sendSignal_(name="stop_move")
-
                 # cv2.imshow('image', img)
                 # cv2.waitKey(10)
                 # lets apply blur to reduce noise
-                # imgBlurred = cv2.GaussianBlur(img, (5, 5), 0)
+                imgBlurred = cv2.GaussianBlur(img, (15, 15), 0)
 
                 # Lets convert the image to HSV
                 imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -101,7 +91,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
                 print(' fireDetected :', self.fireDetected)
                 print(' fdetect : ', self.fdetect)
-                if int(total_number) > 1000:
+                if int(total_number) > 5000:
                     self.fdetect += 1
 
                     if self.fdetect >= 1:
