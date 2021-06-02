@@ -1,12 +1,14 @@
 from PySide6 import QtWidgets
 
 from valkka.api2 import LiveThread, OpenGLThread
-from valkka.api2 import ShmemFilterchain
+# from valkka.api2 import ShmemFilterchain
 from valkka.api2.logging import setValkkaLogLevel, loglevel_silent
+from valkka.api2 import FragMP4ShmemClient
 # Local imports
 from MachineVision.FireDetection import QValkkaFireDetectorProcess
+from Streaming.FilterChain import FragShmemFilterchain
 from multiprocess import QValkkaThread
-from Streaming.Filterchain import WidgetPair, TestWidget0
+from Streaming.ForeignWidget import WidgetPair, TestWidget0
 
 setValkkaLogLevel(loglevel_silent)
 
@@ -67,9 +69,16 @@ class MyGui(QtWidgets.QMainWindow):
 
     def openValkka(self):
 
+        # RGB Shared memory
         shmem_image_dimensions = (1920 // 4, 1080 // 4)
         shmem_image_interval = 1000
         shmem_rignbuffer_size = 100
+
+        # Frag MP4 Shared memory
+        shmem_buffers = 10
+        shmem_name = "FragMP4Shmem"
+        cellsize = 1024*1024*3
+        timeout = 1000
 
         cs = 1
         cc = 1
@@ -134,7 +143,7 @@ class MyGui(QtWidgets.QMainWindow):
             if (a > self.pardic["dec affinity stop"]):
                 a = self.pardic["dec affinity start"]
 
-            chain = ShmemFilterchain(
+            chain = FragShmemFilterchain(
                 # decoding and branching happens here
                 livethread=self.livethread,
                 openglthread=self.openglthread,
@@ -145,7 +154,12 @@ class MyGui(QtWidgets.QMainWindow):
                 shmem_image_dimensions=shmem_image_dimensions,
                 shmem_image_interval=shmem_image_interval,
                 shmem_ringbuffer_size=shmem_rignbuffer_size,
-                msreconnect=10000
+                msreconnect=10000,
+                Frag_shmem_buffers=shmem_buffers,
+                Frag_shmem_name=shmem_name,
+                Frag_shmem_cellsize=cellsize,
+                Timeout=timeout,
+
 
             )
             self.chains.append(chain)
@@ -153,7 +167,8 @@ class MyGui(QtWidgets.QMainWindow):
             win_id = self.openglthread.createWindow(show=False)
             frame = self.QtFrame(self.w, win_id)
 
-            print('setting up layout')
+
+            # print('setting up layout')
             if y > 1:
                 x = 1
                 y = 0
@@ -173,7 +188,30 @@ class MyGui(QtWidgets.QMainWindow):
             cs += 1
             a += 1
             cc += 1
-
+            # FragMP4 shmem client
+            client = FragMP4ShmemClient(
+                name=shmem_name,
+                n_ringbuffer=shmem_buffers,
+                n_size=cellsize,
+                mstimeout=timeout,
+                verbose=False
+            )
+            # print('fragmp4 client starting')
+            # # FragShmemFilterchain.activateFragMP4(FragShmemFilterchain)
+            # xd = 0
+            #
+            # index, meta = client.pullFrame()
+            # if (index == None):
+            #     print('fragmp4 timeout')
+            # else:
+            #     data = client.shmem_list[index][0:meta.size]
+            #     print('got', meta.name, "of size", meta.size)
+            #     # xd += 1
+            #     # if xd >= 100:
+            #     #     break
+            # # print('stopping')
+            #
+            # FragShmemFilterchain.desactivateFragMP4(FragShmemFilterchain)
     def startProcesses(self):
         self.thread.start()
         for p in self.processes:
@@ -201,6 +239,12 @@ class MyGui(QtWidgets.QMainWindow):
         self.stopProcesses()
         self.closeValkka()
         super().closeEvent()
+
+    def fragmp4client(self):
+        # client = FragMP4ShmemClient(
+        #     name=shmem_name
+        # )
+        pass
 
     # Slot
     def addAlert(self):
