@@ -154,7 +154,7 @@ class MyGui(QtWidgets.QMainWindow):
                 shmem_image_dimensions=shmem_image_dimensions,
                 shmem_image_interval=shmem_image_interval,
                 shmem_ringbuffer_size=shmem_rignbuffer_size,
-                msreconnect=10000,
+                msreconnect=1000,
                 frag_shmem_buffers=shmem_buffers,
                 frag_shmem_name=shmem_name,
                 frag_shmem_cellsize=cellsize,

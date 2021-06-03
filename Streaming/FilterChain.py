@@ -438,12 +438,18 @@ class VisionAlarmFilterChain:
         # these two lines for debugging bullshit so feel free to comment/uncomment them ya man
         print(self.pre, "using shmem name ", self.shmem_name)
         print(self.shmem_name)
-        self.shmem_filter = core.RGBShmemFrameFilter(
-            self.shmem_name,
-            n_buf,
-            self.shmem_image_dimensions[0],
-            self.shmem_image_dimensions[1]
-        )
+        try:
+            self.shmem_filter = core.RGBShmemFrameFilter(
+                self.shmem_name,
+                n_buf,
+                self.shmem_image_dimensions[0],
+                self.shmem_image_dimensions[1]
+            )
+            if self.shmem_filter:
+                print("Shared mem created ")
+        except Exception as e:
+            print(" There is a problem in allocating memory to RGBShmemFrameFilter : \n"+e)
+
         # self.shmem_filter = core.InfoFrameFilter("info"+ selft.idst) ## debugging
         self.sws_filter = core.SwScaleFrameFilter(
             "sws_filter" + self.idst,
@@ -451,21 +457,31 @@ class VisionAlarmFilterChain:
             self.shmem_image_dimensions[1],
             self.shmem_filter
         )
+        if self.sws_filter:
+            print("Sws_filter created !")
         self.interval_filter = core.TimeIntervalFrameFilter(
             "interval_filter" + self.idst, self.shmem_image_interval, self.sws_filter
         )
-
+        if self.interval_filter:
+            print("interval_filter created ")
         # Branch 3 : Converting Stream to MP4 | Upload to Azure blob storage if activated
         # For the moment this branch recieve h264 stream and convert it to fragmp4 chunks
         n_buf_fragmp4 = self.frag_shmem_buffers
-        nb_cells = self.frag_shmem_cellsize[0] * self.frag_shmem_cellsize[1] * self.frag_shmem_cellsize[2]
-        self.fshmem_filter = core.FragMP4ShmemFrameFilter(
-            self.frag_shmem_name,
-            nb_cells,
-            n_buf_fragmp4,
-            self.frag_shmem_timeout
+        nb_cells = int(self.frag_shmem_cellsize[0] * self.frag_shmem_cellsize[1] * self.frag_shmem_cellsize[2])
+        print(type(nb_cells))
+        print(nb_cells)
+        try:
+            self.fshmem_filter = core.FragMP4ShmemFrameFilter(
+                self.frag_shmem_name,
+                n_buf_fragmp4,
+                nb_cells,
+                self.frag_shmem_timeout
 
-        )
+            )
+        except Exception as e:
+            print("Failed to create fragmp4 shared memory server : \n"+e)
+        if(self.fshmem_filter):
+            print("fshmem filter created")
         self.mux_filter = core.FragMP4MuxFrameFilter(
             "fragmp4muxer",
             self.fshmem_filter
