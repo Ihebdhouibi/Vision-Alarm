@@ -91,7 +91,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
                 print(' fireDetected :', self.fireDetected)
                 print(' fdetect : ', self.fdetect)
-                if int(total_number) > 5000:
+                if int(total_number) > 10000:
                     self.fdetect += 1
 
                     if self.fdetect >= 1:

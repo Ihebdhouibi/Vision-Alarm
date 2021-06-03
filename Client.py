@@ -6,7 +6,7 @@ from valkka.api2.logging import setValkkaLogLevel, loglevel_silent
 from valkka.api2 import FragMP4ShmemClient
 # Local imports
 from MachineVision.FireDetection import QValkkaFireDetectorProcess
-from Streaming.FilterChain import FragShmemFilterchain
+from Streaming.FilterChain import VisionAlarmFilterChain
 from multiprocess import QValkkaThread
 from Streaming.ForeignWidget import WidgetPair, TestWidget0
 
@@ -72,12 +72,12 @@ class MyGui(QtWidgets.QMainWindow):
         # RGB Shared memory
         shmem_image_dimensions = (1920 // 4, 1080 // 4)
         shmem_image_interval = 1000
-        shmem_rignbuffer_size = 100
+        shmem_rignbuffer_size = 10
 
         # Frag MP4 Shared memory
         shmem_buffers = 10
         shmem_name = "FragMP4Shmem"
-        cellsize = 1024*1024*3
+        cellsize = (1024, 1024, 3)
         timeout = 1000
 
         cs = 1
@@ -143,7 +143,7 @@ class MyGui(QtWidgets.QMainWindow):
             if (a > self.pardic["dec affinity stop"]):
                 a = self.pardic["dec affinity start"]
 
-            chain = FragShmemFilterchain(
+            chain = VisionAlarmFilterChain(
                 # decoding and branching happens here
                 livethread=self.livethread,
                 openglthread=self.openglthread,
@@ -155,10 +155,10 @@ class MyGui(QtWidgets.QMainWindow):
                 shmem_image_interval=shmem_image_interval,
                 shmem_ringbuffer_size=shmem_rignbuffer_size,
                 msreconnect=10000,
-                Frag_shmem_buffers=shmem_buffers,
-                Frag_shmem_name=shmem_name,
-                Frag_shmem_cellsize=cellsize,
-                Timeout=timeout,
+                frag_shmem_buffers=shmem_buffers,
+                frag_shmem_name=shmem_name,
+                frag_shmem_cellsize=cellsize,
+                frag_shmem_timeout=timeout,
 
 
             )
@@ -240,11 +240,11 @@ class MyGui(QtWidgets.QMainWindow):
         self.closeValkka()
         super().closeEvent()
 
-    def fragmp4client(self):
-        # client = FragMP4ShmemClient(
-        #     name=shmem_name
-        # )
-        pass
+    # def fragmp4client(self):
+    #     # client = FragMP4ShmemClient(
+    #     #     name=shmem_name
+    #     # )
+    #     pass
 
     # Slot
     def addAlert(self):
@@ -255,7 +255,7 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp",
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.43.1:8080/h264_ulaw.sdp",
                        "rtsp://iheb:iheb@192.168.1.14:8080/h264_ulaw.sdp",
                        "rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp",
                        "rtsp://iheb:iheb@192.168.1.29:8080/h264_ulaw.sdp"],
