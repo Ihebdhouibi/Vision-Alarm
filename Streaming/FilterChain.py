@@ -376,7 +376,7 @@ class VisionAlarmFilterChain:
         # FragMP4Shmem name
         "frag_shmem_name": None,
         # FragMP4Shmem cellsize
-        "frag_shmem_cellsize": (int, 1024*1024*3),
+        "frag_shmem_cellsize": (int, 1024 * 1024 * 3),
         # FragMP4Shmem timeout
         "frag_shmem_timeout": (int, 1000)
     }
@@ -397,6 +397,7 @@ class VisionAlarmFilterChain:
 
         self.init()
         setValkkaLogLevel(loglevel_silent)
+
     def init(self):
         self.idst = str(id(self))
         self.makeChain()
@@ -420,7 +421,7 @@ class VisionAlarmFilterChain:
         """
         Create the filter chain
         """
-
+        setValkkaLogLevel(loglevel_silent)
         if (self.shmem_name is None):
             self.shmem_name = "shmemff" + self.idst
 
@@ -428,7 +429,6 @@ class VisionAlarmFilterChain:
 
         # self.n_bytes = self.shmem_image_dimensions[0] * self.shmem_image_dimensions[1]*3
         n_buf = self.shmem_ringbuffer_size
-
 
         # Branch 1 : Displaying Stream to the dashboard
         # get input FrameFilter from OpenGLThread
@@ -438,13 +438,13 @@ class VisionAlarmFilterChain:
         self.avthread1_1 = core.AVThread(
             "avthread_" + self.idst,
             # self.fork_filter,  # AVthread writes to self.fork_filter
-            self.gl_in_filter
+            self.gl_in_filter,
+            # self.framefifo_ctx
         )
         self.avthread1_1.setAffinity(self.affinity)
 
         # get input framefilter from avthread
         self.av_in_filter1_1 = self.avthread1_1.getFrameFilter()
-
 
         # Branch 2 : Saving frames to shared memory for openCV/Tensorflow process
         # these two lines for debugging bullshit so feel free to comment/uncomment them ya man
@@ -460,7 +460,7 @@ class VisionAlarmFilterChain:
             if self.shmem_filter:
                 print("Shared mem created ")
         except Exception as e:
-            print(" There is a problem in allocating memory to RGBShmemFrameFilter : \n"+e)
+            print(" There is a problem in allocating memory to RGBShmemFrameFilter : \n" + e)
 
         # self.shmem_filter = core.InfoFrameFilter("info"+ selft.idst) ## debugging
         self.sws_filter = core.SwScaleFrameFilter(
@@ -479,7 +479,8 @@ class VisionAlarmFilterChain:
         self.avthread2_1 = core.AVThread(
             "avthread_" + self.idst,
             # self.fork_filter,  # AVthread writes to self.fork_filter
-            self.interval_filter
+            self.interval_filter,
+            # self.framefifo_ctx
         )
         self.avthread2_1.setAffinity(self.affinity)
 
@@ -490,7 +491,7 @@ class VisionAlarmFilterChain:
         # For the moment this branch recieve h264 stream and convert it to fragmp4 chunks
         n_buf_fragmp4 = self.frag_shmem_buffers
 
-        nb_cells = 1024*1024*3
+        nb_cells = 1024 * 1024 * 3
         # print(type(nb_cells))
         # print(nb_cells)
         try:
@@ -500,14 +501,14 @@ class VisionAlarmFilterChain:
                 nb_cells
             )
         except Exception as e:
-            print("Failed to create fragmp4 shared memory server : \n",e)
-        if(self.fshmem_filter):
+            print("Failed to create fragmp4 shared memory server : \n", e)
+        if (self.fshmem_filter):
             print("fshmem filter created")
         self.mux_filter = core.FragMP4MuxFrameFilter(
             "fragmp4muxer",
             self.fshmem_filter
         )
-        if(self.mux_filter):
+        if (self.mux_filter):
             print("mux filter created")
         # self.mux_filter.activate()
 
@@ -523,19 +524,9 @@ class VisionAlarmFilterChain:
         # Main branch
         self.framefifo_ctx = core.FrameFifoContext()
         self.framefifo_ctx.n_basic = self.n_basic
-        # self.framefifo_ctx.n_setup = self.n_setup
-        # self.framefifo_ctx.n_signal = self.n_signal
-        # self.framefifo_ctx.flush_when_full = self.flush_when_full
-        #
-        # self.avthread = core.AVThread(
-        #     "avthread_" + self.idst,
-        #     self.fork_filter,  # AVthread writes to self.fork_filter
-        #     self.framefifo_ctx
-        # )
-        # self.avthread.setAffinity(self.affinity)
-
-        # get input framefilter from avthread
-        # self.av_in_filter = self.avthread.getFrameFilter()
+        self.framefifo_ctx.n_setup = self.n_setup
+        self.framefifo_ctx.n_signal = self.n_signal
+        self.framefifo_ctx.flush_when_full = self.flush_when_full
 
     # A functions that returns Shared memory parameters
     def getShmemPars(self):
@@ -602,6 +593,7 @@ class VisionAlarmFilterChain:
         """
         self.avthread1_1.startCall()
         self.avthread2_1.startCall()
+
     def stopThreads(self):
         """
         Stops threads in the filter chain
