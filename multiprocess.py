@@ -210,7 +210,7 @@ class QValkkaOpenCVProcess(ValkkaProcess):
         self.running = False
 
     def create_client_(self):
-        # print("inside create_client of multiprocess \n shmem name is {} for process number ".format(self.shmem_name))
+        print("inside create_client of multiprocess \n shmem name is {} for process number ".format(self.shmem_name))
         self.client = ShmemRGBClient(
             name=self.shmem_name,
             n_ringbuffer=self.n_buffer,  # size of ring buffer

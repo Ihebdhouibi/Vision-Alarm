@@ -1,3 +1,5 @@
+from valkka.api2 import FragMP4ShmemClient
+
 from multiprocess import QValkkaOpenCVProcess
 from PySide6 import QtCore
 import time
@@ -50,13 +52,14 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
         # print('inside FireDetectorProcess')
         if self.client is None:
             time.sleep(1.0)
+            print('client timedout')
         else:
             index, isize = self.client.pull()
             if (index is None):
                 # print(self.pre, "Client timed out..")
                 pass
             else:
-                print("Client index, size =", index, isize)
+                # print("Client index, size =", index, isize)
                 try:
                     data = self.client.shmem_list[index]
                     # print(data)
@@ -91,9 +94,23 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
                 print(' fireDetected :', self.fireDetected)
                 print(' fdetect : ', self.fdetect)
+
+
                 if int(total_number) > 10000:
                     self.fdetect += 1
-
+                    # Fragmp4 shared mem server
+                    # clientf = FragMP4ShmemClient(
+                    #     "FragMP4Shmem",
+                    #     10,
+                    #     1024*1024*3,
+                    #     1000
+                    # )
+                    # index , metaf = clientf.pullFrame()
+                    # if index == None:
+                    #     print('tnekna')
+                    # else:
+                    #     data = clientf.shmem_list[index][0:metaf.size]
+                    #     print('got', metaf.name, "of size", metaf.size)
                     if self.fdetect >= 1:
                         if self.fireDetected is False:
                             print('Fire detected')

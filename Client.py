@@ -77,7 +77,7 @@ class MyGui(QtWidgets.QMainWindow):
         # Frag MP4 Shared memory
         shmem_buffers = 10
         shmem_name = "FragMP4Shmem"
-        cellsize = (1024, 1024, 3)
+        cellsize = 1024*1024*3
         timeout = 1000
 
         cs = 1
@@ -125,6 +125,7 @@ class MyGui(QtWidgets.QMainWindow):
             q = QtWidgets.QMessageBox.warning(self,
                                               "VBLANK WARNING",
                                               "Syncing to vertical refresh enabled \n THIS WILL DESTROY YOUR FRAMERATE\n disable it using 'export vblank_mode=0'")
+
         tokens = []
         self.chains = []
         self.frames = []
