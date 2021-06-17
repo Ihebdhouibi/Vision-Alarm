@@ -1,3 +1,4 @@
+
 from valkka import core
 from valkka.api2.threads import LiveThread, OpenGLThread
 from valkka.api2.tools import parameterInitCheck, typeCheck
@@ -330,7 +331,7 @@ class VisionAlarmFilterChain:
         * Frames are decoded in the main branch from H264 => YUV
         * The stream of YUV frames is forked into two branches
         * branch 1 goes to OpenGLThread that interpolates YUV to RGB on the GPU
-        * branch 2 goes to interval_filter that passes a YUV frame only once every second.  From there, frames are interpolated on the CPU from YUV to RGB and finally passed through shared memory to another process.
+(        * branch 2 goes to interval_filter that passes a YUV frame only once every second.  From there, frames are interpolated on the CPU from YUV to RGB and finally passed through shared memory to another process.
         * branch 3 goes to fragmp4muxer
         """
 
@@ -368,13 +369,13 @@ class VisionAlarmFilterChain:
         "shmem_image_interval": (int, 1000),
         # size of the ringbuffer
         "shmem_ringbuffer_size": (int, 10),
-        "shmem_name": None,
+        "shmem_name": str,
 
         # Shared memory for FragMP4 chunks
         # FragMP4Shmem buffers size
         "frag_shmem_buffers": (int, 10),
         # FragMP4Shmem name
-        "frag_shmem_name": None,
+        "frag_shmem_name": str,
         # FragMP4Shmem cellsize
         "frag_shmem_cellsize": (int, 1024 * 1024 * 3),
         # FragMP4Shmem timeout
@@ -422,8 +423,8 @@ class VisionAlarmFilterChain:
         Create the filter chain
         """
         setValkkaLogLevel(loglevel_silent)
-        if (self.shmem_name is None):
-            self.shmem_name = "shmemff" + self.idst
+        # if (self.shmem_name is None):
+        #     self.shmem_name = "shmemff" + self.idst
 
         print(self.pre, self.shmem_name)
 

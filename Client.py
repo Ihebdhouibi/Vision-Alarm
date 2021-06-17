@@ -85,7 +85,7 @@ class MyGui(QtWidgets.QMainWindow):
         self.processes = []
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
-            print("shmem name is {} for process number {} ".format(shmem_name, cc))
+            # print("shmem name is {} for process number {} ".format(shmem_name, cc))
             process = QValkkaFireDetectorProcess(
                 "process" + str(cs),
                 shmem_name=shmem_name,
@@ -241,11 +241,6 @@ class MyGui(QtWidgets.QMainWindow):
         self.closeValkka()
         super().closeEvent()
 
-    # def fragmp4client(self):
-    #     # client = FragMP4ShmemClient(
-    #     #     name=shmem_name
-    #     # )
-    #     pass
 
     # Slot
     def addAlert(self):
@@ -256,10 +251,7 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.43.1:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.1.14:8080/h264_ulaw.sdp",
-                       "rtsp://cam:cam@192.168.1.13:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.1.29:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.26:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}

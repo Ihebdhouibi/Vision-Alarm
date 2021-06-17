@@ -50,7 +50,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
     def cycle_(self):
         # print('inside FireDetectorProcess')
-        # print(self.client.name)
+
         if self.client is None:
             time.sleep(1.0)
             # print('client timedout')
@@ -60,7 +60,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 print(self.pre, "Client timed out..")
                 pass
             else:
-                print("Client index, size =", index, isize)
+                # print("Client index, size =", index, isize)
                 try:
                     data = self.client.shmem_list[index]
                     # print(data)
@@ -72,13 +72,12 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 except BaseException:
                     print("QValkkaMovementDetectorProcess: WARNING: could not reshape image")
 
-                # cv2.imshow('image', img)
-                # cv2.waitKey(10)
+
                 # lets apply blur to reduce noise
                 imgBlurred = cv2.GaussianBlur(img, (15, 15), 0)
 
                 # Lets convert the image to HSV
-                imgHSV = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+                imgHSV = cv2.cvtColor(imgBlurred, cv2.COLOR_BGR2HSV)
 
                 # Define the mask
                 lower_mask_value = [18, 50, 50]
@@ -91,13 +90,9 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
                 # Count the total number of red pixels ; total number of non zero pixels
                 total_number = cv2.countNonZero(mask)
-                print('total number : ', int(total_number))
+                # print('total number : ', int(total_number))
 
-                # print(' fireDetected :', self.fireDetected)
-                # print(' fdetect : ', self.fdetect)
-
-
-                if int(total_number) > 10000:
+                if int(total_number) > 5000:
                     self.fdetect += 1
 
                     if self.fdetect >= 1:

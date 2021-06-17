@@ -93,3 +93,15 @@ class WidgetPair:
     def getWidget(self):
         return self.foreign_widget
 
+
+class QtFrame:
+    def __init__(self, parent, win_id):
+        self.widget = QtWidgets.QWidget(parent)
+        self.lay = QtWidgets.QVBoxLayout(self.widget)
+
+        self.widget_pair = WidgetPair(self.widget, win_id, TestWidget0)
+        self.video = self.widget_pair.getWidget()
+        self.lay.addWidget(self.video)
+
+    def getWindowId(self):
+        return int(self.widget.winId())
