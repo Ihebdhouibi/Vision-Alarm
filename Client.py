@@ -24,6 +24,7 @@ class MyGui(QtWidgets.QMainWindow):
             self.video = self.widget_pair.getWidget()
             self.lay.addWidget(self.video)
 
+
         def getWindowId(self):
             return int(self.widget.winId())
 
@@ -121,10 +122,10 @@ class MyGui(QtWidgets.QMainWindow):
             msbuftime=100,
             affinity=-1
         )
-        if (self.openglthread.hadVsync()):
-            q = QtWidgets.QMessageBox.warning(self,
-                                              "VBLANK WARNING",
-                                              "Syncing to vertical refresh enabled \n THIS WILL DESTROY YOUR FRAMERATE\n disable it using 'export vblank_mode=0'")
+        # if (self.openglthread.hadVsync()):
+        #     q = QtWidgets.QMessageBox.warning(self,
+        #                                       "VBLANK WARNING",
+        #                                       "Syncing to vertical refresh enabled \n THIS WILL DESTROY YOUR FRAMERATE\n disable it using 'export vblank_mode=0'")
 
         tokens = []
         self.chains = []
@@ -197,22 +198,8 @@ class MyGui(QtWidgets.QMainWindow):
                 mstimeout=timeout,
                 verbose=False
             )
-            # print('fragmp4 client starting')
-            # # FragShmemFilterchain.activateFragMP4(FragShmemFilterchain)
-            # xd = 0
-            #
-            # index, meta = client.pullFrame()
-            # if (index == None):
-            #     print('fragmp4 timeout')
-            # else:
-            #     data = client.shmem_list[index][0:meta.size]
-            #     print('got', meta.name, "of size", meta.size)
-            #     # xd += 1
-            #     # if xd >= 100:
-            #     #     break
-            # # print('stopping')
-            #
-            # FragShmemFilterchain.desactivateFragMP4(FragShmemFilterchain)
+
+
     def startProcesses(self):
         self.thread.start()
         for p in self.processes:
@@ -251,7 +238,7 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.26:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}

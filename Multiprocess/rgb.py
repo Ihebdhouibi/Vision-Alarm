@@ -2,9 +2,14 @@ import time, sys
 from setproctitle import setproctitle
 from valkka.multiprocess import MessageProcess, MessageObject, safe_select
 from valkka.api2 import ShmemRGBClient
-from skeleton.singleton import getEventFd, reserveIndex
+from Singleton import getEventFd, reserveIndex
 from .sync import EventGroup, SyncIndex
+import numpy as np
+import cv2
 
+
+# local imports
+from MachineVision.FireDetection.base import FireDetector
 
 class RGB24Process(MessageProcess):
     """A multiprocess that reads RGB24 frames from shared memory and does something with them
@@ -109,6 +114,7 @@ class RGB24Process(MessageProcess):
         slot
         mstimestamp
         """
+        FireDetector(frame)
         # send a message to the main process like this:
         self.send_out__({"results from": "RGB24Process"})
 

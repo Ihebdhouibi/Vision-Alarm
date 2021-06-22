@@ -2,7 +2,8 @@ import time, sys, asyncio, copy
 from valkka.multiprocess import MessageProcess, AsyncBackMessageProcess, \
     MessageObject, safe_select
 from valkka.api2 import FragMP4ShmemClient
-from skeleton.singleton import getEventFd, reserveIndex
+from Singleton import getEventFd, reserveIndex
+import numpy as np
 
 """NOTE:
 Never call reserveEventFd / releaseEventFd from a child multiprocess
@@ -37,9 +38,11 @@ class FragMP4Process(AsyncBackMessageProcess):
 
     """
 
+
     def __init__(self, mstimeout=1000):
         super().__init__()
         self.mstimeout = mstimeout
+        self.data = []
 
     """BACKEND methods
 
@@ -53,15 +56,21 @@ class FragMP4Process(AsyncBackMessageProcess):
         self.client_by_fd = {}
         self.count_by_fd = {}
         self.shmem_pars_by_slot = {}
+        self.data = []
 
     def postRun__(self):
         """Last thing executed before multiprocess exits
         """
         print("postRun__")
+        # Converting the mp4 array into a video
+        print("final size ",len(self.data))
 
     async def asyncPre__(self):
         """First thing executed in the async event loop
+        TODO : Develop a websocket for streaming live
         """
+
+
         print("asyncPre__")
 
     async def asyncPost__(self):
@@ -135,8 +144,11 @@ class FragMP4Process(AsyncBackMessageProcess):
                 print("FragMP4Process: fmp4callback__ : number of fmp4 fragments received is", self.count_by_fd[fd])
                 print("FragMP4Process: fmp4callback__ : got fmp4 fragment of size", meta.size)
                 print("FragMP4Process: fmp4callback__ : of type", meta.name)
+                pass
+
 
             data = client.shmem_list[index][0:meta.size]
+            # print(len(data))
             """
             ..thats a numpy array of your fmp4 fragment
 
@@ -145,6 +157,7 @@ class FragMP4Process(AsyncBackMessageProcess):
             - place that fragment (and metadata) into an asyncio.Queue
             - ..which can then be read by a task (maybe one per video stream)
             """
+            self.data.append(data)
 
     # commands that come from the main python process (aka frontend)
 
@@ -162,6 +175,12 @@ class FragMP4Process(AsyncBackMessageProcess):
 
     These methods are called by your main python process
     """
+    def returnVideoArray(self):
+        return self.data
+
+    def uploadtocloud(self):
+        data = self.data
+        print(data)
 
     def activateFMP4Client(self,
                            name=None,
@@ -198,30 +217,30 @@ class FragMP4Process(AsyncBackMessageProcess):
         # that intercommunicates with backend and looks
         # for method "c__customCall" there in
 
-
-def main():
-    """A trivial test
-    """
-    p = FragMP4Process()
-    p.start()
-    time.sleep(1)
-    print("activate")
-    ipc_index = reserveIndex()
-    p.activateFMP4Client(
-        name="kokkelis",
-        n_ringbuffer=10,
-        n_size=1024 * 1024,
-        ipc_index=ipc_index
-    )
-    time.sleep(1)
-    p.deactivateFMP4Client(
-        ipc_index=ipc_index
-    )
-    time.sleep(1)
-    print("exiting")
-    p.stop()
-
-
-if __name__ == "__main__":
-    main()
-
+#
+# def main():
+#     """A trivial test
+#     """
+#     p = FragMP4Process()
+#     p.start()
+#     time.sleep(1)
+#     print("activate")
+#     ipc_index = reserveIndex()
+#     p.activateFMP4Client(
+#         name="kokkelis",
+#         n_ringbuffer=10,
+#         n_size=1024 * 1024,
+#         ipc_index=ipc_index
+#     )
+#     time.sleep(1)
+#     p.deactivateFMP4Client(
+#         ipc_index=ipc_index
+#     )
+#     time.sleep(1)
+#     print("exiting")
+#     p.stop()
+#
+#
+# if __name__ == "__main__":
+#     main()
+#

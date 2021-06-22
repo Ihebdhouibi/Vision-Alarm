@@ -1,10 +1,13 @@
 import time
 import sys
 from valkka import core
-
+from PySide6 import QtWidgets, QtGui
 # Local imports
+
 from Singleton import reserveEventFd, releaseEventFd, eventFdToIndex
 from Streaming.ForeignWidget import QtFrame
+
+
 class VisionAlarmFilterChain:
     """
     This is the filter graph of VisionAlarm system :
@@ -38,11 +41,14 @@ class VisionAlarmFilterChain:
 
     """
 
-    def __init__(self, address = None, slot = None):
-        assert(isinstance(address, str))
-        assert(isinstance(slot, int))
+    def __init__(self, widget, layout, address=None, slot=None):
+        assert (isinstance(address, str))
+        assert (isinstance(slot, int))
 
+        self.widget = widget
+        self.lay = layout
         self.rgb_sync_event = reserveEventFd()
+
         self.fmp4_sync_event = reserveEventFd()
 
         id_ = str(id(self))
@@ -59,33 +65,32 @@ class VisionAlarmFilterChain:
         self.height = 1080
         # Posix shared memory
         self.rgb_shmem_name = id_ + "_rgb"
-        self.rgb_shmem_buffers = 10 # number of cells in ringbuffer
+        self.rgb_shmem_buffers = 10  # number of cells in ringbuffer
 
         # Shared memory defition for fragMP4
         self.fmp4_shmem_buffers = 10
         self.fmp4_shmem_name = id_ + "_fragmp4"
-        self.fmp4_shmem_cellsize = 1024*1024*1
-
+        self.fmp4_shmem_cellsize = 1024 * 1024 * 1
 
     def __del__(self):
         if self.active:
             self.close()
 
     def alert_cb(self, tup):
-        print("alert cb got ",tup)
+        print("alert cb got ", tup)
 
-    def __call__(self, livethread = None, openglthread = None):
+    def __call__(self, livethread=None, openglthread=None):
         """
         Register running live & openglthreads, construct filterchain, start threads
 
         """
-        assert(livethread is not None)
+        assert (livethread is not None)
         self.livethread = livethread
         self.openglthread = openglthread
 
         # Construct Filter graph from end to beginning
         # Main branch
-        self.main_fork = core.ForkFrameFilterN("main_fork"+str(self.slot))
+        self.main_fork = core.ForkFrameFilterN("main_fork" + str(self.slot))
 
         # connect livethread to main branch
         self.live_ctx = core.LiveConnectionContext(core.LiveConnectionType_rtsp,
@@ -97,7 +102,7 @@ class VisionAlarmFilterChain:
         ## 1 : for NATs and Streaming over the internet, use tcp streaming
         self.live_ctx.request_tcp = True
         ## 2 : if you don't have enough buffering or timestamps are wrong, use this:
-        #self.live_ctx.time_correction = core.TimeCorrectionType_smart
+        # self.live_ctx.time_correction = core.TimeCorrectionType_smart
         ## 3 : enable automatic reconnection every 10 seconds if camera is offline
         self.live_ctx.mstimeout = 10000
 
@@ -105,54 +110,72 @@ class VisionAlarmFilterChain:
 
         # Branch B : Mux Branch
         self.fmp4_shmem = core.FragMP4ShmemFrameFilter(
-                    self.fmp4_shmem_name,
-                    self.fmp4_shmem_buffers,
-                    self.fmp4_shmem_cellsize
+            self.fmp4_shmem_name,
+            self.fmp4_shmem_buffers,
+            self.fmp4_shmem_cellsize
         )
         print(">", self.fmp4_sync_event)
         self.fmp4_shmem.useFd(self.fmp4_sync_event)
         self.fmp4_muxer = core.FragMP4MuxFrameFilter("mp4_muxer", self.fmp4_shmem)
         # self.fmp4_muxer.activate()
         # connect main branch to mux branch
-        self.main_fork.connect("fragmp4_terminal" +str(self.slot), self.fmp4_muxer)
+        self.main_fork.connect("fragmp4_terminal" + str(self.slot), self.fmp4_muxer)
         # muxer must be connected from the very beginning so that it receives setupframes, sent only in the beginning of streaming process
 
         # Branch A : Decoding Branch
-        self.decode_fork = core.ForkFrameFilterN("decode_fork_"+str(self.slot))
-        self.avthread = core.AVThread("avthread_"+str(self.slot), self.decode_fork) # Here avthread feeds decode_fork
+        self.decode_fork = core.ForkFrameFilterN("decode_fork_" + str(self.slot))
+        self.avthread = core.AVThread("avthread_" + str(self.slot), self.decode_fork)  # Here avthread feeds decode_fork
         # connect main branch to avthread to decode_fork
         self.avthread_in_filter = self.avthread.getFrameFilter()
-        self.main_fork.connect("decoder_"+str(self.slot), self.avthread_in_filter)
+        self.main_fork.connect("decoder_" + str(self.slot), self.avthread_in_filter)
 
         # Branch A : Sub_Branch_A.1 : RGB shared memory
         self.rgb_shmem_filter = core.RGBShmemFrameFilter(
-                    self.rgb_shmem_name,
-                    self.rgb_shmem_buffers,
-                    self.width,
-                    self.height
+            self.rgb_shmem_name,
+            self.rgb_shmem_buffers,
+            self.width,
+            self.height
         )
         self.rgb_shmem_filter.useFd(self.rgb_sync_event)
         self.sws_filter = core.SwScaleFrameFilter("sws_filter", self.width, self.height, self.rgb_shmem_filter)
         self.interval_filter = core.TimeIntervalFrameFilter("interval_filter", self.image_interval, self.sws_filter)
-        self.decode_fork.connect("rgb_shmem_terminal"+str(self.slot), self.interval_filter)
+        self.decode_fork.connect("rgb_shmem_terminal" + str(self.slot), self.interval_filter)
 
         # Branch A : Sub_Branch_A.2 : OpenGl branch Displaying
         if self.openglthread is not None:
             # connect decode frames in opengl
             self.opengl_input_filter = self.openglthread.getFrameFilter()
-            self.decode_fork.connect("gl_terminal"+str(self.slot), self.opengl_input_filter)
+            self.decode_fork.connect("gl_terminal" + str(self.slot), self.opengl_input_filter)
             # Create X window
-            self.window_id = self.openglthread.createWindow(show=False)
+            #
+            # win_id = self.openglthread.createWindow(show=False)
+            # frame = QtFrame(self.widget, win_id)
+            # self.lay.addWidget(frame.widget, 0, 0)
+            #
+            # token = self.openglthread.connect(slot=self.slot, window_id=win_id)
+            # if token == 0:
+            #     print("mapping failled  ! ")
+            # else:
+            #     print("mapping done ! ")
+            self.window_id = self.openglthread.createWindow()
             self.openglthread.newRenderGroupCall(self.window_id)
-            # frame = QtFrame()
-            # maps stream with slot 1 to window "window_id"
+
             self.context_id = self.openglthread.newRenderContextCall(self.slot, self.window_id, 0)
 
         self.livethread.playStreamCall(self.live_ctx)
         self.avthread.startCall()
         self.avthread.decodingOnCall()
 
+    def startStream(self):
+        self.livethread.playStreamCall(self.live_ctx)
+        self.avthread.startCall()
+        self.avthread.decodingOnCall()
+    #
+    # def returnFrame(self):
+    #     return self.foreign_widget
 
+    def returnFrameId(self):
+        return self.win_id
 
 
     def activateFragMP4(self):
@@ -241,14 +264,14 @@ def main():
         print("please give rtsp camera address as the first argument")
 
     filterchain = VisionAlarmFilterChain(
-        address = sys.argv[1],
-        slot = 1,
-        rgb_sync_event = reserveEventFd(),
-        fmp4_sync_event = reserveEventFd()
+        address=sys.argv[1],
+        slot=1,
+        rgb_sync_event=reserveEventFd(),
+        fmp4_sync_event=reserveEventFd()
     )
 
     ## runs the filterchain
-    filterchain(livethread = livethread, openglthread = openglthread)
+    filterchain(livethread=livethread, openglthread=openglthread)
     print("server is running for some time")
     filterchain.activateFragMP4()
     time.sleep(12)
