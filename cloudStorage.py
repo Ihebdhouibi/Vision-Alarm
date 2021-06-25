@@ -6,8 +6,12 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, _
 
 
 def initBlogClient():
-    connect_string = 'DefaultEndpointsProtocol=https;AccountName=visioalarm;AccountKey=wyhuiTxICPRdr0/4K/Nxb2oSYNqNPIhsdzNxfFnO6hiCLxu7Xb2xZKBH77USAxGPriizb2QqABBj3f+yUCxlzA==;EndpointSuffix=core.windows.net'
+    """
+    TODO: remove cloud connection string
 
+    """
+    connect_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+    print("Connection string : ", connect_string)
     blob_service_client = BlobServiceClient.from_connection_string(connect_string)
 
     return blob_service_client
@@ -24,12 +28,13 @@ def createAzureContainer():
 def uploadBlob(videoArray, videoName, width, height):
 
     blob_service_client = initBlogClient()
+    videoName = videoName + " " + str(datetime.date.today()) + ".mp4"
     blob_client = blob_service_client.get_blob_client(container="alerts", blob=videoName)
 
     # Converting videoArray ( numpy array ) into video
     fps = 25 # 25 frames per second
 
-    videoName = videoName + " "+ str(datetime.date.today()) + ".mp4"
+
     print(videoName)
     output = cv2.VideoWriter(videoName, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height), True)
     for i in videoArray:
