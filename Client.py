@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets
 
 from valkka.api2 import LiveThread, OpenGLThread
-# from valkka.api2 import ShmemFilterchain
+from valkka.api2 import ShmemFilterchain
 from valkka.api2.logging import setValkkaLogLevel, loglevel_silent
 from valkka.api2 import FragMP4ShmemClient
 # Local imports
@@ -9,7 +9,7 @@ from MachineVision.FireDetection import QValkkaFireDetectorProcess
 from Streaming.FilterChain import VisionAlarmFilterChain
 from multiprocess import QValkkaThread
 from Streaming.ForeignWidget import WidgetPair, TestWidget0
-
+from MachineVision.FallDetection import QValkkaFallDetection
 setValkkaLogLevel(loglevel_silent)
 
 
@@ -93,6 +93,14 @@ class MyGui(QtWidgets.QMainWindow):
                 n_buffer=shmem_rignbuffer_size,
                 image_dimensions=shmem_image_dimensions
             )
+
+            self.processes.append(process)
+            process = QValkkaFallDetection(
+                "process" + str(cs),
+                shmem_name=shmem_name,
+                n_buffer=shmem_rignbuffer_size,
+                image_dimensions=shmem_image_dimensions
+            )
             self.processes.append(process)
             cs += 1
         print(self.processes)
@@ -145,24 +153,34 @@ class MyGui(QtWidgets.QMainWindow):
             if (a > self.pardic["dec affinity stop"]):
                 a = self.pardic["dec affinity start"]
 
-            chain = VisionAlarmFilterChain(
-                # decoding and branching happens here
+            # chain = VisionAlarmFilterChain(
+            #     # decoding and branching happens here
+            #     livethread=self.livethread,
+            #     openglthread=self.openglthread,
+            #     address=address,
+            #     slot=cs,
+            #     affinity=a,
+            #     shmem_name="camera" + str(cs),
+            #     shmem_image_dimensions=shmem_image_dimensions,
+            #     shmem_image_interval=shmem_image_interval,
+            #     shmem_ringbuffer_size=shmem_rignbuffer_size,
+            #     msreconnect=1000,
+            #     frag_shmem_buffers=shmem_buffers,
+            #     frag_shmem_name=shmem_name,
+            #     frag_shmem_cellsize=cellsize,
+            #     frag_shmem_timeout=timeout,
+            #
+            #
+            # )
+            chain = ShmemFilterchain(
                 livethread=self.livethread,
                 openglthread=self.openglthread,
                 address=address,
                 slot=cs,
-                affinity=a,
                 shmem_name="camera" + str(cs),
-                shmem_image_dimensions=shmem_image_dimensions,
+                shmem_image_dimensions= shmem_image_dimensions,
                 shmem_image_interval=shmem_image_interval,
-                shmem_ringbuffer_size=shmem_rignbuffer_size,
-                msreconnect=1000,
-                frag_shmem_buffers=shmem_buffers,
-                frag_shmem_name=shmem_name,
-                frag_shmem_cellsize=cellsize,
-                frag_shmem_timeout=timeout,
-
-
+                shmem_ringbuffer_size= shmem_rignbuffer_size
             )
             self.chains.append(chain)
 
@@ -191,13 +209,7 @@ class MyGui(QtWidgets.QMainWindow):
             a += 1
             cc += 1
             # FragMP4 shmem client
-            client = FragMP4ShmemClient(
-                name=shmem_name,
-                n_ringbuffer=shmem_buffers,
-                n_size=cellsize,
-                mstimeout=timeout,
-                verbose=False
-            )
+
 
 
     def startProcesses(self):
@@ -238,7 +250,7 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.12:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.102:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}

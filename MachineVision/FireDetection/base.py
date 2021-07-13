@@ -22,9 +22,8 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
     outgoing_signal_defs = {
         "pong_o": {"message": str},
-        "start_move": {},
         "Fire_detected": {},
-        "stop_move": {}
+
     }
 
     # For each outgoing signal, create a Qt signal with the same name.  The
@@ -59,7 +58,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
         else:
             index, isize = self.client.pull()
             if (index is None):
-                print(self.pre, "Client timed out..")
+                # print(self.pre, "Client timed out..")
                 pass
             else:
                 # print("Client index, size =", index, isize)

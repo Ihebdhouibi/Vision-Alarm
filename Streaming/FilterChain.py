@@ -158,160 +158,7 @@ from valkka.api2.logging import setValkkaLogLevel, loglevel_silent
 #         self.avthread.decodingOnCall()
 
 
-# class FragShmemFilterchain(BasicFilterchain):
-#     """A filter chain with a shared mem hook and FragMP4ShmemFrameFilter
-#
-#     ::
-#
-#       (LiveThread:livethread) -->> (AVThread:avthread) --+
-#                                                          |   main branch
-#       {ForkFrameFilter: fork_filter} <-------------------+
-#                  |
-#         branch 1 +-->> (OpenGLThread:glthread)
-#                  |
-#         branch 2 +--> {IntervalFrameFilter: interval_filter} --> {SwScaleFrameFilter: sws_filter} --> {RGBShmemFrameFilter: shmem_filter}
-#                  |
-#         branch 3 +--> {FragMP4MuxFrameFilter:fragmp4muxer} --> {FragMP4ShmemFrameFilter:fragmp4shmem}
-#
-#     * Frames are decoded in the main branch from H264 => YUV
-#     * The stream of YUV frames is forked into two branches
-#     * branch 1 goes to OpenGLThread that interpolates YUV to RGB on the GPU
-#     * branch 2 goes to interval_filter that passes a YUV frame only once every second.  From there, frames are interpolated on the CPU from YUV to RGB and finally passed through shared memory to another process.
-#     * branch 3 goes to fragmp4muxer
-#     """
-#     setValkkaLogLevel(loglevel_silent)
-#     parameter_defs = {  # additional parameters to the mother class
-#         # images passed over shmem are full-hd/4 reso
-#         "shmem_image_dimensions": (tuple, (1920 // 4, 1080 // 4)),
-#         # .. passed every 1000 milliseconds
-#         "shmem_image_interval": (int, 1000),
-#         # size of the ringbuffer
-#         "shmem_ringbuffer_size": (int, 10),
-#         "shmem_name": None,
-#
-#         # FragMP4Shmem buffers size
-#         "Frag_shmem_buffers": (int, 10),
-#         # FragMP4Shmem name
-#         "Frag_shmem_name": None,
-#         # FragMP4Shmem cellsize
-#         "Frag_shmem_cellsize": (int, 1024 * 1024 * 3),
-#         # FragMP4shmem timeout
-#         "Timeout": (int, 1000)
-#     }
-#
-#     parameter_defs.update(BasicFilterchain.parameter_defs)  # don't forget!
-#
-#     def __init__(self, **kwargs):
-#         # auxiliary string for debugging output
-#         self.pre = self.__class__.__name__ + " : "
-#         # check for input parameters, attach them to this instance as
-#         # attributes
-#         parameterInitCheck(self.parameter_defs, kwargs, self)
-#         typeCheck(self.shmem_image_dimensions[0], int)
-#         typeCheck(self.shmem_image_dimensions[1], int)
-#         self.init()
-#
-#     def makeChain(self):
-#         """Create the filter chain
-#         """
-#         if (self.shmem_name is None):
-#             self.shmem_name = "shmemff" + self.idst
-#         # print(self.pre,self.shmem_name)
-#
-#         # self.n_bytes =self.shmem_image_dimensions[0]*self.shmem_image_dimensions[1]*3
-#         n_buf = self.shmem_ringbuffer_size
-#         fn_buf = self.Frag_shmem_buffers
-#
-#         # branch 1
-#         # get input FrameFilter from OpenGLThread
-#         self.gl_in_filter = self.openglthread.getInput()
-#
-#         # branch 2
-#         # print(self.pre,"using shmem name",self.shmem_name)
-#         # print(self.shmem_name)
-#         self.shmem_filter = core.RGBShmemFrameFilter(
-#             self.shmem_name,
-#             n_buf,
-#             self.shmem_image_dimensions[0],
-#             self.shmem_image_dimensions[1])  # shmem id, cells, width, height
-#         # self.shmem_filter    =core.InfoFrameFilter        ("info"+self.idst)
-#         # # debug
-#
-#         self.sws_filter = core.SwScaleFrameFilter(
-#             "sws_filter" + self.idst,
-#             self.shmem_image_dimensions[0],
-#             self.shmem_image_dimensions[1],
-#             self.shmem_filter)
-#         self.interval_filter = core.TimeIntervalFrameFilter(
-#             "interval_filter" + self.idst, self.shmem_image_interval, self.sws_filter)
-#
-#         # branch 3
-#         self.fshmem_filter = core.FragMP4ShmemFrameFilter(
-#             self.Frag_shmem_name,
-#             fn_buf,
-#             self.Frag_shmem_cellsize
-#         )
-#         self.muxFilter = core.FragMP4MuxFrameFilter(
-#             "fragmp4muxer",
-#             self.fshmem_filter
-#         )
-#         # self.muxFilter.activate()
-#         # self.ConvertingStreamToFragMP4()
-#         # fork: writes to branches 1 and 2
-#         # self.fork_filter     =core.ForkFrameFilter
-#         # ("fork_filter"+self.idst,self.gl_in_filter,self.sws_filter) # FIX
-#         self.fork_filter = core.ForkFrameFilter3(
-#             "fork_filter" + self.idst,
-#             self.gl_in_filter,
-#             self.interval_filter,
-#             self.muxFilter
-#         )
-#
-#
-#         # self.fork_filter     =core.ForkFrameFilter         ("fork_filter"+self.idst,self.gl_in_filter,None)
-#         # self.fork_filter=self.gl_in_filter # debugging
-#
-#         # main branch
-#         self.framefifo_ctx = core.FrameFifoContext()
-#         self.framefifo_ctx.n_basic = self.n_basic
-#         self.framefifo_ctx.n_setup = self.n_setup
-#         self.framefifo_ctx.n_signal = self.n_signal
-#         self.framefifo_ctx.flush_when_full = self.flush_when_full
-#
-#         self.avthread = core.AVThread(
-#             "avthread_" + self.idst,
-#             self.fork_filter,
-#             self.framefifo_ctx)  # AVThread writes to self.fork_filter
-#         self.avthread.setAffinity(self.affinity)
-#         # get input FrameFilter from AVThread
-#         self.av_in_filter = self.avthread.getFrameFilter()
-#         # self.av_in_filter is used by BasicFilterchain.createContext that passes self.av_in_filter to LiveThread
-#         # # self.live_out_filter =core.InfoFrameFilter    ("live_out_filter"+self.idst,self.av_in_filter)
-#
-#
-#
-#     def ConvertingStreamToFragMP4(self):
-#         client = FragMP4ShmemClient(
-#             name= self.Frag_shmem_name,
-#             n_ringbuffer=self.Frag_shmem_buffers,
-#             n_size=self.Frag_shmem_cellsize,
-#             mstimeout=self.Timeout,
-#             verbose=False
-#         )
-#         print('fragmp4 client starting')
-#         index, meta = client.pullFrame()
-#         if(index == None):
-#             print('fragmp4 timeout')
-#         else:
-#             data = client.shmem_list[index][0:meta.size]
-#             print('got', meta.name, "of size", meta.size)
-#
-#     def getShmemPars(self):
-#         """Returns shared mem name that should be used in the client process and the ringbuffer size
-#         """
-#         # SharedMemRingBuffer(const char* name, int n_cells, std::size_t n_bytes, int mstimeout=0, bool is_server=false); // <pyapi>
-#         # return self.shmem_name, self.shmem_ringbuffer_size, self.n_bytes
-#         return self.shmem_name, self.shmem_ringbuffer_size, self.shmem_image_dimensions/
+
 
 class VisionAlarmFilterChain:
     """A filter chain with a shared mem hook and FragMP4ShmemFrameFilter
@@ -489,36 +336,35 @@ class VisionAlarmFilterChain:
         self.av_in_filter2_1 = self.avthread2_1.getFrameFilter()
 
         # Branch 3 : Converting Stream to MP4 | Upload to Azure blob storage if activated
-        # For the moment this branch recieve h264 stream and convert it to fragmp4 chunks
-        n_buf_fragmp4 = self.frag_shmem_buffers
-
-        nb_cells = 1024 * 1024 * 3
-        # print(type(nb_cells))
-        # print(nb_cells)
-        try:
-            self.fshmem_filter = core.FragMP4ShmemFrameFilter(
-                self.frag_shmem_name,
-                n_buf_fragmp4,
-                nb_cells
-            )
-        except Exception as e:
-            print("Failed to create fragmp4 shared memory server : \n", e)
-        if (self.fshmem_filter):
-            print("fshmem filter created")
-        self.mux_filter = core.FragMP4MuxFrameFilter(
-            "fragmp4muxer",
-            self.fshmem_filter
-        )
-        if (self.mux_filter):
-            print("mux filter created")
+        # # For the moment this branch recieve h264 stream and convert it to fragmp4 chunks
+        # n_buf_fragmp4 = self.frag_shmem_buffers
+        #
+        # nb_cells = 1024 * 1024 * 3
+        # # print(type(nb_cells))
+        # # print(nb_cells)
+        # try:
+        #     self.fshmem_filter = core.FragMP4ShmemFrameFilter(
+        #         self.frag_shmem_name,
+        #         n_buf_fragmp4,
+        #         nb_cells
+        #     )
+        # except Exception as e:
+        #     print("Failed to create fragmp4 shared memory server : \n", e)
+        # if (self.fshmem_filter):
+        #     print("fshmem filter created")
+        # self.mux_filter = core.FragMP4MuxFrameFilter(
+        #     "fragmp4muxer",
+        #     self.fshmem_filter
+        # )
+        # if (self.mux_filter):
+        #     print("mux filter created")
         # self.mux_filter.activate()
 
         # Fork : Writes to branches 1, 2 and 3
-        self.fork_filter = core.ForkFrameFilter3(
+        self.fork_filter = core.ForkFrameFilter(
             "fork_filter" + self.idst,
             self.av_in_filter1_1,
-            self.av_in_filter2_1,
-            self.mux_filter
+            self.av_in_filter2_1
 
         )
 
@@ -581,12 +427,12 @@ class VisionAlarmFilterChain:
         # send information about the stream to livethread
         self.livethread.registerStream(self.ctx)
         self.livethread.playStream(self.ctx)
-        self.mux_filter.activate()
+        # self.mux_filter.activate()
 
     def closeContext(self):
         self.livethread.stopStream(self.ctx)
         self.livethread.deregisterStream(self.ctx)
-        self.mux_filter.deActivate()
+        # self.mux_filter.deActivate()
 
     def startThreads(self):
         """
