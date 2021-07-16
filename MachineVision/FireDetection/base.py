@@ -114,41 +114,41 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
         self.signals.Fire_detected.emit()
 
 
-class FireDetector:
-
-    fireDetected = False
-    fdetect = 0
-
-    incoming_signal_defs = {
-        # each key corresponds to a front- and backend methods
-    }
-
-    outgoing_signals_defs = {
-        "fire_detected": {}
-    }
-    # For each outgoing signal create a Qt signal with the same name.
-
-    def __init__(self, frame):
-
-
-        imgblurred = cv2.GaussianBlur(frame, (15, 15), 0)
-        # Lets convert the image to HSV
-        imgHSV = cv2.cvtColor(imgblurred, cv2.COLOR_BGR2HSV)
-
-        # Define the mask
-        lower_mask_value = [18, 50, 50]
-        upper_mask_value = [36, 255, 255]
-
-        lower_mask_value = np.array(lower_mask_value, dtype='uint8')
-        upper_mask_value = np.array(upper_mask_value, dtype='uint8')
-
-        mask = cv2.inRange(imgHSV, lower_mask_value, upper_mask_value)
-
-        # Count the total number of red pixels ; total number of non zero pixels
-        total_number = cv2.countNonZero(mask)
-        print('total number : ', int(total_number))
-        if total_number > 500:
-            print("fire detected")
+# class FireDetector:
+#
+#     fireDetected = False
+#     fdetect = 0
+#
+#     incoming_signal_defs = {
+#         # each key corresponds to a front- and backend methods
+#     }
+#
+#     outgoing_signals_defs = {
+#         "fire_detected": {}
+#     }
+#     # For each outgoing signal create a Qt signal with the same name.
+#
+#     def __init__(self, frame):
+#
+#
+#         imgblurred = cv2.GaussianBlur(frame, (15, 15), 0)
+#         # Lets convert the image to HSV
+#         imgHSV = cv2.cvtColor(imgblurred, cv2.COLOR_BGR2HSV)
+#
+#         # Define the mask
+#         lower_mask_value = [18, 50, 50]
+#         upper_mask_value = [36, 255, 255]
+#
+#         lower_mask_value = np.array(lower_mask_value, dtype='uint8')
+#         upper_mask_value = np.array(upper_mask_value, dtype='uint8')
+#
+#         mask = cv2.inRange(imgHSV, lower_mask_value, upper_mask_value)
+#
+#         # Count the total number of red pixels ; total number of non zero pixels
+#         total_number = cv2.countNonZero(mask)
+#         print('total number : ', int(total_number))
+#         if total_number > 500:
+#             print("fire detected")
 
     # """
     # Frontend methods

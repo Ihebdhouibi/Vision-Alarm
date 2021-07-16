@@ -57,7 +57,7 @@ class QValkkaFallDetection(QValkkaOpenCVProcess):
 
             if index is None:
                 print(self.pre, "Client timed out.. ")
-                pass
+                # pass
 
             else:
                 print("Client index, size =",index, isize)

@@ -86,7 +86,7 @@ class MyGui(QtWidgets.QMainWindow):
         self.processes = []
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
-            # print("shmem name is {} for process number {} ".format(shmem_name, cc))
+            print("shmem name is {} for process number {} ".format(shmem_name, cc))
             process = QValkkaFireDetectorProcess(
                 "process" + str(cs),
                 shmem_name=shmem_name,
@@ -180,7 +180,8 @@ class MyGui(QtWidgets.QMainWindow):
                 shmem_name="camera" + str(cs),
                 shmem_image_dimensions= shmem_image_dimensions,
                 shmem_image_interval=shmem_image_interval,
-                shmem_ringbuffer_size= shmem_rignbuffer_size
+                shmem_ringbuffer_size= shmem_rignbuffer_size,
+                msreconnect = 10000
             )
             self.chains.append(chain)
 
@@ -202,7 +203,7 @@ class MyGui(QtWidgets.QMainWindow):
             process.createClient()  # creates the shared memory client at the multiprocess
             # connect signals to the nested widget
 
-            process.signals.Fire_detected.connect(self.addAlert)
+            # process.signals.Fire_detected.connect(self.addAlert)
 
             chain.decodingOn()  # start the decoding thread
             cs += 1
