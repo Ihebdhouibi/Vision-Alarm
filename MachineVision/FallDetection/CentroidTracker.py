@@ -6,7 +6,7 @@ import numpy as np
 
 class CentroidTracker:
 
-    def __init__(self, maxDisappeared=10):
+    def __init__(self, maxDisappeared=50):
 
         # a counter to asign a uniqueID to each object
         # if the object passes the maxDisappeared number of frames we will asign a new ObjectID
