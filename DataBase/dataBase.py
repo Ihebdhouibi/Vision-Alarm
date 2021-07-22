@@ -2,7 +2,6 @@ import psycopg2
 from configparser import ConfigParser
 
 
-
 def storeFireAlertData(alertTime, videoLink, AlertClass):
     """
 
@@ -18,11 +17,11 @@ def storeFireAlertData(alertTime, videoLink, AlertClass):
 
     # Try connection
     try:
-        conn = psycopg2.connect(host= "127.0.0.1",
-                                     user="postgres",
-                                     database="visionalarm",
-                                     password="root",
-                                     port="5432")
+        conn = psycopg2.connect(host="127.0.0.1",
+                                user="postgres",
+                                database="visionalarm",
+                                password="root",
+                                port="5432")
         cursor = conn.cursor()
         # print connexion settings
         print("Connexion settings : ", conn.get_dsn_parameters())
@@ -33,13 +32,39 @@ def storeFireAlertData(alertTime, videoLink, AlertClass):
     # Storing alert data
     query = "insert into fire_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
 
-
-
     cursor.execute(query, (alertTime, videoLink, AlertClass))
     conn.commit()
 
     # Close connection
     conn.close()
+
+
+def storeFallAlertData(alertTime, videoLink, AlertClass):
+    # Try connection
+    try:
+        conn = psycopg2.connect(host="127.0.0.1",
+                                user="postgres",
+                                database="visionalarm",
+                                password="root",
+                                port="5432")
+        cursor = conn.cursor()
+        # print connexion settings
+        print("Connexion settings : ", conn.get_dsn_parameters())
+    except (Exception, psycopg2.Error) as error:
+        print("Error while trying to connect to PostgreSQL ", error)
+
+    # Connection achieved
+    # Storing alert data
+    try:
+        query = "insert into fall_alerts (alert_time, video_link, class) values (%s, %s, %s)"
+
+        cursor.execute(query, (alertTime, videoLink, AlertClass))
+        conn.commit()
+    except Exception as e :
+        print("There is an issue inserting alert information into fall_alerts")
+    # close connection
+    conn.close()
+
 
 def storeMouvementAlertData(alertTime, videoLink, AlertClass):
     """
@@ -56,11 +81,11 @@ def storeMouvementAlertData(alertTime, videoLink, AlertClass):
 
     # Try connection
     try:
-        conn = psycopg2.connect(host= "127.0.0.1",
-                                     user="postgres",
-                                     database="visionalarm",
-                                     password="root",
-                                     port="5432")
+        conn = psycopg2.connect(host="127.0.0.1",
+                                user="postgres",
+                                database="visionalarm",
+                                password="root",
+                                port="5432")
         cursor = conn.cursor()
         # print connexion settings
         print("Connexion settings : ", conn.get_dsn_parameters())
@@ -71,18 +96,18 @@ def storeMouvementAlertData(alertTime, videoLink, AlertClass):
     # Storing alert data
     query = "insert into mouvement_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
 
-
-
     cursor.execute(query, (alertTime, videoLink, AlertClass))
     conn.commit()
 
     # Close connection
     conn.close()
 
+
 def retrieveAlertData():
     """
     TODO: develop a method that fetch data from AlertsTables
     """
 
-storeFireAlertData("{20:20:20}", "{link}", True)
-storeMouvementAlertData("{20:20:20}", "{link}", True)
+
+# storeFireAlertData("{20:20:20}", "{link}", True)
+# storeMouvementAlertData("{20:20:20}", "{link}", True)

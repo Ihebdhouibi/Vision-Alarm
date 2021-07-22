@@ -74,7 +74,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                     print("QValkkaMovementDetectorProcess: WARNING: could not reshape image")
 
                 # lets apply blur to reduce noise
-                imgBlurred = cv2.GaussianBlur(img, (15, 15), 0)
+                imgBlurred = cv2.GaussianBlur(img, (23, 23), 0)
 
                 # Lets convert the image to HSV
                 imgHSV = cv2.cvtColor(imgBlurred, cv2.COLOR_BGR2HSV)
@@ -90,7 +90,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
 
                 # Count the total number of red pixels ; total number of non zero pixels
                 total_number = cv2.countNonZero(mask)
-                # print('total number : ', int(total_number))
+                print('total number : ', int(total_number))
 
                 if int(total_number) > 5000:
                     self.fdetect += 1

@@ -1,10 +1,20 @@
 import time
+from collections import OrderedDict
 
-import cv2
+import numpy as np
 import openpifpaf
+import torch.multiprocessing as mp
 
+
+from datetime import datetime
 from multiprocess import QValkkaOpenCVProcess
 from PySide6 import QtCore
+
+# local imports
+from .CentroidTracker import CentroidTracker
+from .FallDetector import FallDetector
+from cloudStorage import uploadBlob
+from DataBase import storeFallAlertData
 
 
 class QValkkaFallDetection(QValkkaOpenCVProcess):
@@ -40,15 +50,23 @@ class QValkkaFallDetection(QValkkaOpenCVProcess):
         self.signals = self.Signals()
         self.predictor = openpifpaf.Predictor(checkpoint='shufflenetv2k30', json_data=True)
         self.annotation_painter = openpifpaf.show.AnnotationPainter()
-        self.noseX = 0
-        self.noseY = 0
 
+        self.centroid_tracker = CentroidTracker()
+        self.fall_detector = FallDetector()
+
+        self.frames = []
+        self.alert = False
+        self.numb_noFall_Frame = 300
+
+        self.fdetect = 0
+        self.fallDetected = False
+        # mp.set_start_method('spawn')
     def alarm(self):
         print("Fall detected ! ")
         self.sendSignal_(name="Fall_detected")
 
     def cycle_(self):
-        # print("inside cycle of fall detection")
+        print("inside cycle of fall detection")
         if self.client is None:
             time.sleep(1.0)
             # print(self.pre, "Client timed out..")
@@ -56,11 +74,11 @@ class QValkkaFallDetection(QValkkaOpenCVProcess):
             index, isize = self.client.pull()
 
             if index is None:
-                print(self.pre, "Client timed out.. ")
-                # pass
+                # print(self.pre, "Client timed out.. ")
+                pass
 
             else:
-                print("Client index, size =",index, isize)
+                # print("Client index, size =", index, isize)
                 try:
                     data = self.client.shmem_list[index]
                 except BaseException:
@@ -72,40 +90,83 @@ class QValkkaFallDetection(QValkkaOpenCVProcess):
                     print("QValkkaFallDetectionProcess : WARNING: could not reshape image")
 
                 # Develop Fall Detection model here
-
-                # RGB_img = img
-
-                predictions, gt_anns, image_meta = self.predictor.numpy_image(img)
-
                 try:
+                    predictions, gt_anns, image_meta = self.predictor.numpy_image(img)
+                    person_number = len(predictions)
+
+                    person_info_for_CT = []
+                    person_info_for_FD = []
 
                     if predictions:
-                        # there is a person in the frame
-                        if predictions[0]["keypoints"][2] != 0:
-                            # nose keypoint valid
-                            if self.noseX == 0:
-                                self.noseX = predictions[0]["keypoints"][0]
-                                current_noseX = self.noseX
-                            if self.noseY == 0:
-                                self.noseY = predictions[0]["keypoints"][1]
-                                current_noseY = self.noseY
+                        j = 0
+                        while j < person_number:
+                            print(f"number of person {len(predictions)}")
+                            keypoints = predictions[j]["keypoints"]
 
-                            current_noseY = predictions[0]["keypoints"][1]
-                            height = predictions[0]["bbox"][3]
-                            width = predictions[0]["bbox"][2]
+                            if keypoints.count(0.0) > len(keypoints) / 1.5:
+                                # Current keypoint is not valid abandone it
+                                j += 1
+                                continue
 
-                            print("height : ", height)
-                            print("width : ", width)
-                        if self.noseY < current_noseY * 2:
+                            # otherwise keypoint is valid ! Lets do the stuff
+                            startX = int(predictions[j]["bbox"][0])
+                            startY = int(predictions[j]["bbox"][1])
+                            endX = int(startX + predictions[j]["bbox"][2])
+                            endY = int(startY + predictions[j]["bbox"][3])
 
-                            if width > height:
+                            width = predictions[j]["bbox"][2]
+                            height = predictions[j]["bbox"][3]
 
-                               print("Fall detected")
+                            person_info_for_CT.append((startX, startY, endX, endY))
+                            person_info_for_FD.append((startX, startY, endX, endY, width, height))
+
+                            j += 1
+
+                    persons = self.centroid_tracker.update(rects=person_info_for_CT)
+                    persons2 = OrderedDict()
+
+                    if len(person_info_for_FD) > 0:
+                        for ID in range(0, len(person_info_for_FD)):
+                            persons2[ID] = person_info_for_FD[ID]
+
+                    fall = self.fall_detector.update(persons2)
+
+                    if fall:
+                        self.numb_noFall_Frame = 0
+                        self.frames.append(img)
+                        # print("Fall detected")
+                        self.fdetect += 1
+                        if self.fdetect >=1:
+                            if self.fallDetected is False:
+                                print("Fall detected")
+                                self.sendSignal_(name="Fall_detected")
+                                self.fallDetected = True
+                                print(f"fallDetected = {self.fallDetected}")
+
+                    elif self.numb_noFall_Frame < 300:
+                        self.numb_noFall_Frame += 1
+                        self.frames.append(img)
+                        self.alert = True
+
                     else:
-                        print("no person available ")
+                        if self.alert:
+                            video = np.stack(self.frames, axis=0)
+                            img_height, img_width, img_channels = img.shape
+                            videoLink = uploadBlob(videoArray=video,
+                                                   videoName="Fall_Alert",
+                                                   width=img_width,
+                                                   height=img_height)
 
-                except BaseException as e:
-                    print("Exception : ", e)
+                            alertTime = str(datetime.today()) + " " + datetime.now().strftime("%H:%M:%S")
+
+                            # Storing the alert
+                            storeFallAlertData(alertTime=alertTime,
+                                               videoLink=videoLink,
+                                               AlertClass=True)
+
+                            self.alert = False
+                except Exception as e:
+                    print(self.pre, "There is an issue extracting info from predictor : ", e)
 
 
 

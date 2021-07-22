@@ -3,13 +3,13 @@ from PySide6 import QtWidgets
 from valkka.api2 import LiveThread, OpenGLThread
 from valkka.api2 import ShmemFilterchain
 from valkka.api2.logging import setValkkaLogLevel, loglevel_silent
-from valkka.api2 import FragMP4ShmemClient
+
 # Local imports
 from MachineVision.FireDetection import QValkkaFireDetectorProcess
-from Streaming.FilterChain import VisionAlarmFilterChain
 from multiprocess import QValkkaThread
 from Streaming.ForeignWidget import WidgetPair, TestWidget0
 from MachineVision.FallDetection import QValkkaFallDetection
+
 setValkkaLogLevel(loglevel_silent)
 
 
@@ -75,18 +75,14 @@ class MyGui(QtWidgets.QMainWindow):
         shmem_image_interval = 1000
         shmem_rignbuffer_size = 10
 
-        # Frag MP4 Shared memory
-        shmem_buffers = 10
-        shmem_name = "FragMP4Shmem"
-        cellsize = 1024*1024*3
-        timeout = 1000
-
         cs = 1
         cc = 1
-        self.processes = []
+        self.fire_processes = []
+        self.fall_processes = []
+
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
-            print("shmem name is {} for process number {} ".format(shmem_name, cc))
+            # print(f"shmem name is {shmem_name} for process number {cs} ")
             process = QValkkaFireDetectorProcess(
                 "process" + str(cs),
                 shmem_name=shmem_name,
@@ -94,20 +90,22 @@ class MyGui(QtWidgets.QMainWindow):
                 image_dimensions=shmem_image_dimensions
             )
 
-            self.processes.append(process)
+            self.fire_processes.append(process)
             process = QValkkaFallDetection(
                 "process" + str(cs),
                 shmem_name=shmem_name,
                 n_buffer=shmem_rignbuffer_size,
                 image_dimensions=shmem_image_dimensions
             )
-            self.processes.append(process)
+            self.fall_processes.append(process)
             cs += 1
-        print(self.processes)
+        print(self.fire_processes)
+        # print(self.fall_processes)
 
         # Give the multiprocesses to a gthread that's reading their message / thread will be listening to the processes !?
 
-        self.thread = QValkkaThread(processes=self.processes)
+        all_processes = self.fire_processes + self.fall_processes
+        self.thread = QValkkaThread(processes=all_processes)
 
         # start the multiprocesses
         self.startProcesses()
@@ -130,10 +128,10 @@ class MyGui(QtWidgets.QMainWindow):
             msbuftime=100,
             affinity=-1
         )
-        # if (self.openglthread.hadVsync()):
-        #     q = QtWidgets.QMessageBox.warning(self,
-        #                                       "VBLANK WARNING",
-        #                                       "Syncing to vertical refresh enabled \n THIS WILL DESTROY YOUR FRAMERATE\n disable it using 'export vblank_mode=0'")
+        if (self.openglthread.hadVsync()):
+            q = QtWidgets.QMessageBox.warning(self,
+                                              "VBLANK WARNING",
+                                              "Syncing to vertical refresh enabled \n THIS WILL DESTROY YOUR FRAMERATE\n disable it using 'export vblank_mode=0'")
 
         tokens = []
         self.chains = []
@@ -146,6 +144,8 @@ class MyGui(QtWidgets.QMainWindow):
         y = 0
         cam_count = 0
         a = self.pardic["dec affinity start"]
+
+        mysignals = ["Fire_detected", "Fall_detected"]
         for address in self.addresses:
 
             # Livethread/openglthread are running
@@ -199,27 +199,34 @@ class MyGui(QtWidgets.QMainWindow):
             tokens.append(token)
 
             # take corresponding multiprocess
-            process = self.processes[cc]
+            process = self.fire_processes[cc]
             process.createClient()  # creates the shared memory client at the multiprocess
             # connect signals to the nested widget
+            process.signals.Fire_detected.connect(self.fireAlert)
 
-            # process.signals.Fire_detected.connect(self.addAlert)
+            process = self.fall_processes[cc]
+            process.createClient()
+            process.signals.Fall_detected.connect(self.fallAlert)
+
 
             chain.decodingOn()  # start the decoding thread
             cs += 1
             a += 1
             cc += 1
-            # FragMP4 shmem client
 
 
 
     def startProcesses(self):
         self.thread.start()
-        for p in self.processes:
+        for p in self.fire_processes:
+            p.start()
+        for p in self.fall_processes:
             p.start()
 
     def stopProcesses(self):
-        for p in self.processes:
+        for p in self.fire_processes:
+            p.stop()
+        for p in self.fall_processes:
             p.stop()
         print("stopping QThread")
         self.thread.stop()
@@ -243,11 +250,14 @@ class MyGui(QtWidgets.QMainWindow):
 
 
     # Slot
-    def addAlert(self):
-        print('inside addAlert ')
+    def fireAlert(self):
+        print('inside fireAlert slot method')
         self.alert.append('Fire Detected on camera number 1')
         pass
 
+    def fallAlert(self):
+        print("inside fallAlert slot method")
+        self.alert.append('Fall detected on camera number 1 ')
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
