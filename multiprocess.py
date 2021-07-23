@@ -6,6 +6,8 @@ import time
 import sys
 import cv2
 from valkka.api2 import ShmemRGBClient
+import multiprocessing as mp
+import dill as pickle
 
 class QValkkaProcess(ValkkaProcess):
     """A multiprocess with Qt signals
@@ -171,6 +173,7 @@ class QValkkaOpenCVProcess(ValkkaProcess):
         parameterInitCheck(QValkkaOpenCVProcess.parameter_defs, kwargs, self)
         typeCheck(self.image_dimensions[0], int)
         typeCheck(self.image_dimensions[1], int)
+
 
     def preRun_(self):
         """Create the shared memory client after fork

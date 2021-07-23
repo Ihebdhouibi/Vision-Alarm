@@ -1,1 +1,12 @@
+.gitignore
 /data/
+*.mp4
+*.jpeg
+*.jpg
+
+testopenpifpaf.py
+oldcode.py
+test.py
+
+Multiprocess/fragmp4.py
+Multiprocess/*

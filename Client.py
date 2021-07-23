@@ -3,6 +3,7 @@ from PySide6 import QtWidgets
 from valkka.api2 import LiveThread, OpenGLThread
 from valkka.api2 import ShmemFilterchain
 from valkka.api2.logging import setValkkaLogLevel, loglevel_silent
+import torch.multiprocessing as mp
 
 # Local imports
 from MachineVision.FireDetection import QValkkaFireDetectorProcess
@@ -35,7 +36,7 @@ class MyGui(QtWidgets.QMainWindow):
         self.pardic = pardic
         self.initVars()
         self.setupUI()
-
+        # mp.set_start_method('spawn', force=True)
         if self.debug: return
         self.openValkka()
 
@@ -80,6 +81,7 @@ class MyGui(QtWidgets.QMainWindow):
         self.fire_processes = []
         self.fall_processes = []
 
+
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
             # print(f"shmem name is {shmem_name} for process number {cs} ")
@@ -105,6 +107,7 @@ class MyGui(QtWidgets.QMainWindow):
         # Give the multiprocesses to a gthread that's reading their message / thread will be listening to the processes !?
 
         all_processes = self.fire_processes + self.fall_processes
+
         self.thread = QValkkaThread(processes=all_processes)
 
         # start the multiprocesses

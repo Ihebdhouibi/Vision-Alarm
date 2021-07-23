@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 import numpy as np
 import openpifpaf
-import torch.multiprocessing as mp
+
 
 
 from datetime import datetime
@@ -60,7 +60,7 @@ class QValkkaFallDetection(QValkkaOpenCVProcess):
 
         self.fdetect = 0
         self.fallDetected = False
-        # mp.set_start_method('spawn')
+
     def alarm(self):
         print("Fall detected ! ")
         self.sendSignal_(name="Fall_detected")
