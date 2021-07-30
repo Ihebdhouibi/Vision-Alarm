@@ -170,6 +170,7 @@ class QValkkaOpenCVProcess(ValkkaProcess):
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
         self.signals = self.Signals()
+
         parameterInitCheck(QValkkaOpenCVProcess.parameter_defs, kwargs, self)
         typeCheck(self.image_dimensions[0], int)
         typeCheck(self.image_dimensions[1], int)
