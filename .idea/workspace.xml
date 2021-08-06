@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d10f0fb4-5f6c-4505-8fe1-48ab739be7ed" name="Changes" comment="">
+    <list default="true" id="aa77dbc9-2a6e-4dfc-b550-fed1495be375" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MachineVision/FallDetection/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/FallDetection/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudStorage.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudStorage.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +42,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
   </component>
-  <component name="RunManager" selected="Python.testopenpifpaf">
+  <component name="RunManager" selected="Python.Client">
     <configuration name="Client" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Vision-Alarm" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -86,23 +87,29 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.Client" />
+      <item itemvalue="Python.testopenpifpaf" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.testopenpifpaf" />
         <item itemvalue="Python.Client" />
+        <item itemvalue="Python.testopenpifpaf" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="d10f0fb4-5f6c-4505-8fe1-48ab739be7ed" name="Changes" comment="" />
       <created>1627985922234</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1627985922234</updated>
       <workItem from="1627985931483" duration="796000" />
       <workItem from="1628001729473" duration="154000" />
+      <workItem from="1628028198532" duration="1988000" />
+      <workItem from="1628070591660" duration="2581000" />
+      <workItem from="1628248003365" duration="199000" />
     </task>
     <servers />
   </component>
@@ -130,8 +137,8 @@
     <SUITE FILE_PATH="coverage/Vision_Alarm$xscreen_test.coverage" NAME="xscreen_test Coverage Results" MODIFIED="1621842995698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$test_studio_detector_2.coverage" NAME="test_studio_detector_2 Coverage Results" MODIFIED="1621807769527" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$multiple_stream.coverage" NAME="multiple_stream Coverage Results" MODIFIED="1620001360530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_1/qt" />
-    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1627858001900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1628249858004" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$demo_base.coverage" NAME="demo_base Coverage Results" MODIFIED="1619089011231" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
-    <SUITE FILE_PATH="coverage/Vision_Alarm$testopenpifpaf.coverage" NAME="testopenpifpaf Coverage Results" MODIFIED="1628001750636" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Vision_Alarm$testopenpifpaf.coverage" NAME="testopenpifpaf Coverage Results" MODIFIED="1628071745948" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

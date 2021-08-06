@@ -26,7 +26,7 @@ def createAzureContainer():
     container_client = blob_service_client.create_container(container_name)
 
 
-def uploadBlob(videoArray, videoName, width, height):
+def uploadBlob(videoArray, videoName, width, height, fps):
 
     blob_service_client = initBlogClient()
     current_time = datetime.now()
@@ -36,7 +36,7 @@ def uploadBlob(videoArray, videoName, width, height):
     blob_client = blob_service_client.get_blob_client(container="alerts", blob=videoName)
 
     # Converting videoArray ( numpy array ) into video
-    fps = 30 # 25 frames per second
+    # fps = 30 # 25 frames per second
 
 
     # print(videoName)
