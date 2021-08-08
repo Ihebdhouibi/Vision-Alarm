@@ -53,13 +53,13 @@ class QValkkaRobberyDetectorProcess(QValkkaOpenCVProcess):
                 except BaseException:
                     print("QValkkaRobberyDetectorProcess: WARNING: could not reshape image")
 
-                if self.personDetector.cycle(img):
-                    print(self.personDetector.cycle(img))
-                    print("Now let's detect if there is ongoing robbery ")
-                else:
-                    print(self.personDetector.cycle(img))
-                    print("Nothing detected yet ! ")
-                    pass
+                # if self.personDetector.cycle(img):
+                #     print(self.personDetector.cycle(img))
+                #     print("Now let's detect if there is ongoing robbery ")
+                # else:
+                #     print(self.personDetector.cycle(img))
+                #     print("Nothing detected yet ! ")
+                #     pass
 
     # ** Frontend methods handling recieved outgoing signals
 

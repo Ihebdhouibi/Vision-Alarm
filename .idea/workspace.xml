@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa77dbc9-2a6e-4dfc-b550-fed1495be375" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudStorage.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudStorage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MachineVision/RobberyDetection/PersonDetector.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/RobberyDetection/PersonDetector.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MachineVision/RobberyDetection/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/RobberyDetection/base.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +43,34 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
   </component>
-  <component name="RunManager" selected="Python.Client">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/AlertAdmin" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.AlertAdmin">
+    <configuration name="AlertAdmin" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Vision-Alarm" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AlertAdmin" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/AlertAdmin/AlertAdmin.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Client" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Vision-Alarm" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -57,6 +85,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Client.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="PersonDetector" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Vision-Alarm" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/MachineVision/RobberyDetection" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/MachineVision/RobberyDetection/PersonDetector.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -90,9 +140,13 @@
     <list>
       <item itemvalue="Python.Client" />
       <item itemvalue="Python.testopenpifpaf" />
+      <item itemvalue="Python.PersonDetector" />
+      <item itemvalue="Python.AlertAdmin" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.AlertAdmin" />
+        <item itemvalue="Python.PersonDetector" />
         <item itemvalue="Python.Client" />
         <item itemvalue="Python.testopenpifpaf" />
       </list>
@@ -110,6 +164,10 @@
       <workItem from="1628028198532" duration="1988000" />
       <workItem from="1628070591660" duration="2581000" />
       <workItem from="1628248003365" duration="199000" />
+      <workItem from="1628331222377" duration="2831000" />
+      <workItem from="1628417028776" duration="3015000" />
+      <workItem from="1628420237409" duration="108000" />
+      <workItem from="1628420669519" duration="1444000" />
     </task>
     <servers />
   </component>
@@ -121,7 +179,9 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Vision_Alarm$test.coverage" NAME="test Coverage Results" MODIFIED="1619224223707" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Dashboard" />
+    <SUITE FILE_PATH="coverage/Vision_Alarm$AlertAdmin.coverage" NAME="AlertAdmin Coverage Results" MODIFIED="1628421999516" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/AlertAdmin" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$basic.coverage" NAME="basic Coverage Results" MODIFIED="1620954965930" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="/usr/lib/python3/dist-packages/valkka/api2/chains" />
+    <SUITE FILE_PATH="coverage/Vision_Alarm$PersonDetector.coverage" NAME="PersonDetector Coverage Results" MODIFIED="1628417880747" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/MachineVision/RobberyDetection" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$Stream.coverage" NAME="Stream Coverage Results" MODIFIED="1619473904683" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Streaming" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$single_stream_rtsp.coverage" NAME="single_stream_rtsp Coverage Results" MODIFIED="1619996088632" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_1/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$setup.coverage" NAME="setup Coverage Results" MODIFIED="1619645882980" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Downloads/valkka-live-master" />
@@ -137,7 +197,7 @@
     <SUITE FILE_PATH="coverage/Vision_Alarm$xscreen_test.coverage" NAME="xscreen_test Coverage Results" MODIFIED="1621842995698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$test_studio_detector_2.coverage" NAME="test_studio_detector_2 Coverage Results" MODIFIED="1621807769527" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$multiple_stream.coverage" NAME="multiple_stream Coverage Results" MODIFIED="1620001360530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_1/qt" />
-    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1628249858004" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1628250068402" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$demo_base.coverage" NAME="demo_base Coverage Results" MODIFIED="1619089011231" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$testopenpifpaf.coverage" NAME="testopenpifpaf Coverage Results" MODIFIED="1628071745948" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
