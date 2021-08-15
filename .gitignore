@@ -4,4 +4,6 @@ oldcode.py
 testopenpifpaf.py
 
 AlertAdmin/twilio.env
+data/*
+
 
