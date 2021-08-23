@@ -51,16 +51,21 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
         self.frames = []
         self.alert = False
         self.num_noFire_Frame = 10
-
+        self.x = 1
+        self.counter = 0
         self.fdetect = 0
         self.FireDetected = False
+        self.numb_frames = 0
+        self.start_time = time.time()
+
     def alarm(self):
         print('Fire detected')
         self.sendSignal_(name="Fire_detected")
 
     def cycle_(self):
         # print('inside FireDetectorProcess')
-
+        self.counter += 1
+        start_time = time.time()
         if self.client is None:
             time.sleep(1.0)
             # print('client timedout')
@@ -101,6 +106,16 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 total_number = cv2.countNonZero(mask)
                 print('total number : ', int(total_number))
 
+                # calculate fps
+                # self.numb_frames += 1
+                # print("Start time : ",self.start_time)
+                # print("time now : ",time.time())
+                # print("numb_frames :",self.numb_frames)
+                # print("start time - time now = ", time.time()- self.start_time)
+                # if(time.time() - start_time) > 1:
+                #     print("fps : ",self.numb_frames / ( time.time() -self.start_time ))
+
+
                 if int(total_number) > 1000:
                     self.fdetect += 1
                     self.num_noFire_Frame = 0
@@ -124,13 +139,21 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 else:
                     if self.alert:
 
+                        # if(time.time() - start_time) > self.x:
+                        #     print("FPS : ", self.counter / time.time() - start_time)
+                        #     self.counter = 0
+                        #     start_time = time.time()
+                        #     # work on fps
+
+
                         video = np.stack(self.frames, axis=0)
                         img_height, img_width, img_channels = img.shape
-                        videolink = uploadBlob(videoArray=video,
+                        videolink = "{"+ uploadBlob(videoArray=video,
                                                videoName="Fire_Alert",
                                                width=img_width,
-                                               height=img_height)
-                        alertTime = str(datetime.today()) + " " + datetime.now().strftime("%H:%M:%S")
+                                               height=img_height,
+                                               fps=30) + "}"
+                        alertTime = "{" + str(datetime.today()) + " " + datetime.now().strftime("%H:%M:%S") + "}"
 
                         # storing the alert
                         storeFireAlertData(alertTime=alertTime,
