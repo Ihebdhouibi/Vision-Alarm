@@ -167,13 +167,15 @@ class VisionAlarmFilterChain:
 
           (LiveThread:livethread) -->>  --------------------- +
                                                              |   main branch
-          {ForkFrameFilter3: fork_filter} <-------------------+
+          (AVThread:avthread1)  <----------------------------+
+                      |
+          {ForkFrameFilter2: fork_filter}
                      |
-            branch 1 +-->>(AVThread:avthread1_1)-->  (OpenGLThread:glthread)
+            branch 1 +-->>(OpenGLThread:glthread)
                      |
-            branch 2 +--> (AVThread:avthread2_1)--> {IntervalFrameFilter: interval_filter} --> {SwScaleFrameFilter: sws_filter} --> {RGBShmemFrameFilter: shmem_filter}
-                     |
-            branch 3 +--> {FragMP4MuxFrameFilter:fragmp4muxer} --> {FragMP4ShmemFrameFilter:fragmp4shmem}
+            branch 2 +--> {IntervalFrameFilter: interval_filter} --> {SwScaleFrameFilter: sws_filter} --> {RGBShmemFrameFilter: shmem_filter}
+
+
 
         * Frames are decoded in the main branch from H264 => YUV
         * The stream of YUV frames is forked into two branches
@@ -283,16 +285,16 @@ class VisionAlarmFilterChain:
         self.gl_in_filter = self.openglthread.getInput()
 
         # Decoding for displaying
-        self.avthread1_1 = core.AVThread(
-            "avthread_" + self.idst,
-            # self.fork_filter,  # AVthread writes to self.fork_filter
-            self.gl_in_filter,
-            # self.framefifo_ctx
-        )
-        self.avthread1_1.setAffinity(self.affinity)
+        # self.avthread1_1 = core.AVThread(
+        #     "avthread_" + self.idst,
+        #     # self.fork_filter,  # AVthread writes to self.fork_filter
+        #     self.gl_in_filter,
+        #     # self.framefifo_ctx
+        # )
+        # self.avthread1_1.setAffinity(self.affinity)
 
-        # get input framefilter from avthread
-        self.av_in_filter1_1 = self.avthread1_1.getFrameFilter()
+        # # get input framefilter from avthread
+        # self.av_in_filter1_1 = self.avthread1_1.getFrameFilter()
 
         # Branch 2 : Saving frames to shared memory for openCV/Tensorflow process
         # these two lines for debugging bullshit so feel free to comment/uncomment them ya man
@@ -324,49 +326,26 @@ class VisionAlarmFilterChain:
         )
         if self.interval_filter:
             print("interval_filter created ")
-        self.avthread2_1 = core.AVThread(
-            "avthread_" + self.idst,
-            # self.fork_filter,  # AVthread writes to self.fork_filter
-            self.interval_filter,
-            # self.framefifo_ctx
-        )
-        self.avthread2_1.setAffinity(self.affinity)
+        # self.avthread2_1 = core.AVThread(
+        #     "avthread_" + self.idst,
+        #     # self.fork_filter,  # AVthread writes to self.fork_filter
+        #     self.interval_filter,
+        #     # self.framefifo_ctx
+        # )
+        # self.avthread2_1.setAffinity(self.affinity)
 
         # get input framefilter from avthread
-        self.av_in_filter2_1 = self.avthread2_1.getFrameFilter()
-
-        # Branch 3 : Converting Stream to MP4 | Upload to Azure blob storage if activated
-        # # For the moment this branch recieve h264 stream and convert it to fragmp4 chunks
-        # n_buf_fragmp4 = self.frag_shmem_buffers
-        #
-        # nb_cells = 1024 * 1024 * 3
-        # # print(type(nb_cells))
-        # # print(nb_cells)
-        # try:
-        #     self.fshmem_filter = core.FragMP4ShmemFrameFilter(
-        #         self.frag_shmem_name,
-        #         n_buf_fragmp4,
-        #         nb_cells
-        #     )
-        # except Exception as e:
-        #     print("Failed to create fragmp4 shared memory server : \n", e)
-        # if (self.fshmem_filter):
-        #     print("fshmem filter created")
-        # self.mux_filter = core.FragMP4MuxFrameFilter(
-        #     "fragmp4muxer",
-        #     self.fshmem_filter
-        # )
-        # if (self.mux_filter):
-        #     print("mux filter created")
-        # self.mux_filter.activate()
+        # self.av_in_filter2_1 = self.avthread2_1.getFrameFilter()
 
         # Fork : Writes to branches 1, 2 and 3
         self.fork_filter = core.ForkFrameFilter(
             "fork_filter" + self.idst,
-            self.av_in_filter1_1,
-            self.av_in_filter2_1
+            self.gl_in_filter,
+            self.interval_filter
 
         )
+        se
+
 
         # Main branch
         self.framefifo_ctx = core.FrameFifoContext()

@@ -82,7 +82,7 @@ class MyGui(QtWidgets.QMainWindow):
         cs = 1
         cc = 1
         self.fire_processes = []
-        # self.fall_processes = []
+        self.fall_processes = []
         self.robbery_processes = []
 
 
@@ -97,13 +97,13 @@ class MyGui(QtWidgets.QMainWindow):
             # )
 
             # self.fire_processes.append(process)
-            # process = QValkkaFallDetection(
-            #     "process" + str(cs),
-            #     shmem_name=shmem_name,
-            #     n_buffer=shmem_rignbuffer_size,
-            #     image_dimensions=shmem_image_dimensions
-            # )
-            # self.fall_processes.append(process)
+            process = QValkkaFallDetection(
+                "process" + str(cs),
+                shmem_name=shmem_name,
+                n_buffer=shmem_rignbuffer_size,
+                image_dimensions=shmem_image_dimensions
+            )
+            self.fall_processes.append(process)
 
             process = QValkkaRobberyDetectorProcess(
                 "process" + str(cs),
@@ -118,7 +118,7 @@ class MyGui(QtWidgets.QMainWindow):
 
         # Give the multiprocesses to a gthread that's reading their message / thread will be listening to the processes !?
 
-        all_processes = self.robbery_processes
+        all_processes = self.robbery_processes + self.fall_processes
 
         self.thread = QValkkaThread(processes=all_processes)
 
@@ -219,9 +219,9 @@ class MyGui(QtWidgets.QMainWindow):
             # # connect signals to the nested widget
             # process.signals.Fire_detected.connect(self.fireAlert)
 
-            # process = self.fall_processes[cc]
-            # process.createClient()
-            # process.signals.Fall_detected.connect(self.fallAlert)
+            process = self.fall_processes[cc]
+            process.createClient()
+            process.signals.Fall_detected.connect(self.fallAlert)
 
             process = self.robbery_processes[cc]
             process.createClient()
@@ -239,16 +239,16 @@ class MyGui(QtWidgets.QMainWindow):
         self.thread.start()
         # for p in self.fire_processes:
         #     p.start()
-        # for p in self.fall_processes:
-        #     p.start()
+        for p in self.fall_processes:
+            p.start()
         for p in self.robbery_processes:
             p.start()
 
     def stopProcesses(self):
         # for p in self.fire_processes:
         #     p.stop()
-        # for p in self.fall_processes:
-        #     p.stop()
+        for p in self.fall_processes:
+            p.stop()
         for p in self.robbery_processes:
             p.stop()
         print("stopping QThread")
@@ -284,7 +284,7 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.37:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.104.19:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}
