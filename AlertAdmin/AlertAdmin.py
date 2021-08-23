@@ -2,7 +2,7 @@ import os
 from twilio.rest import Client
 from dotenv import load_dotenv
 
-def send_sms(msg):
+def send_sms(msg, phone):
 
     load_dotenv(dotenv_path='twilio.env')
     account_sid = os.environ['TWILIO_ACCOUNT_SID']
@@ -14,7 +14,7 @@ def send_sms(msg):
     message = client.messages.create(
         body=msg,
         from_='+13155632205',
-        to='+21652562136'
+        to=phone
     )
 
 
