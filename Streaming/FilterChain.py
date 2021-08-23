@@ -282,7 +282,8 @@ class VisionAlarmFilterChain:
 
         # Branch 1 : Displaying Stream to the dashboard
         # get input FrameFilter from OpenGLThread
-        self.gl_in_filter = self.openglthread.getInput()
+
+        self.gl_in_filter = self.openglthread.getFrameFilter()
 
         # Decoding for displaying
         # self.avthread1_1 = core.AVThread(

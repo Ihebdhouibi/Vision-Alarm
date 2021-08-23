@@ -4,8 +4,10 @@
     <list default="true" id="aa77dbc9-2a6e-4dfc-b550-fed1495be375" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MachineVision/RobberyDetection/DataGenerator.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/RobberyDetection/DataGenerator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MachineVision/FireDetection/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/FireDetection/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MachineVision/RobberyDetection/PersonDetector.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/RobberyDetection/PersonDetector.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Streaming/FilterChain.py" beforeDir="false" afterPath="$PROJECT_DIR$/Streaming/FilterChain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/multiprocess.py" beforeDir="false" afterPath="$PROJECT_DIR$/multiprocess.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,16 +33,16 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/MachineVision/RobberyDetection/PersonDetector.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/MachineVision/RobberyDetection/base.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/MachineVision/RobberyDetection/PersonDetector.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file:///usr/lib/python3.8/os.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/AlertAdmin/AlertAdmin.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/AlertAdmin/__init__.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/ImagesScrapper.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/AlertAdmin/AlertAdmin.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/AlertAdmin/twilio.env" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/testopenpifpaf.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/AlertAdmin/__init__.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/MachineVision/RobberyDetection/DataGenerator.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Client.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/MachineVision/RobberyDetection/DataGenerator.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/.gitignore" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1wDGmyUNvrP598ghliuSjabhinJ" />
@@ -55,7 +57,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/valkka-examples/api_level_2/qt/demo_filterchains.py" />
+    <property name="last_opened_file_path" value="$USER_HOME$/valkka-examples/api_level_2/qt/test_studio_1.py" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -176,11 +178,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.testopenpifpaf" />
-      <item itemvalue="Python.ImagesScrapper" />
-      <item itemvalue="Python.DataGenerator" />
       <item itemvalue="Python.Client" />
+      <item itemvalue="Python.DataGenerator" />
+      <item itemvalue="Python.ImagesScrapper" />
       <item itemvalue="Python.test_studio_detector" />
+      <item itemvalue="Python.testopenpifpaf" />
     </list>
     <recent_temporary>
       <list>
@@ -221,6 +223,7 @@
       <workItem from="1629709733703" duration="794000" />
       <workItem from="1629710605710" duration="1176000" />
       <workItem from="1629721198042" duration="3079000" />
+      <workItem from="1629731554325" duration="36000" />
     </task>
     <servers />
   </component>
@@ -255,7 +258,7 @@
     <SUITE FILE_PATH="coverage/Vision_Alarm$gunDetector.coverage" NAME="gunDetector Coverage Results" MODIFIED="1628518534663" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Downloads/Theft-Detection-master (1)/Theft-Detection-master" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$test_studio_detector_2.coverage" NAME="test_studio_detector_2 Coverage Results" MODIFIED="1621807769527" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$multiple_stream.coverage" NAME="multiple_stream Coverage Results" MODIFIED="1620001360530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_1/qt" />
-    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1629710301750" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1629733900573" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$testopenpifpaf.coverage" NAME="testopenpifpaf Coverage Results" MODIFIED="1628519996540" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

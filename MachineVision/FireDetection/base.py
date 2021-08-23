@@ -74,10 +74,10 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                     print("QValkkaMovementDetectorProcess: WARNING: could not reshape image")
 
                 # lets apply blur to reduce noise
-                imgBlurred = cv2.GaussianBlur(img, (23, 23), 0)
+                imgBlurred = cv2.GaussianBlur(img, (9, 9), 0)
 
                 # Lets convert the image to HSV
-                imgHSV = cv2.cvtColor(imgBlurred, cv2.COLOR_BGR2HSV)
+                imgHSV = cv2.cvtColor(imgBlurred, cv2.COLOR_RGB2HSV)
 
                 # Define the mask
                 lower_mask_value = [18, 50, 50]

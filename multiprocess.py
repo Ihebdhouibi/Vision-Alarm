@@ -1,5 +1,6 @@
 import imutils
-from valkka.api2 import ValkkaProcess, Namespace, safe_select
+from valkka.api2 import Namespace
+from valkka.api2.multiprocess import ValkkaProcess, safe_select
 from PySide6 import QtCore, QtWidgets
 from valkka.api2.tools import *
 import time

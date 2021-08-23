@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets
 
 from valkka.api2 import LiveThread, OpenGLThread
-from valkka.api2 import ShmemFilterchain
+from valkka.api2.chains import ShmemFilterchain
 from valkka.api2.logging import setValkkaLogLevel, loglevel_silent
 import torch.multiprocessing as mp
 
@@ -88,15 +88,15 @@ class MyGui(QtWidgets.QMainWindow):
 
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
-            # print(f"shmem name is {shmem_name} for process number {cs} ")
-            # process = QValkkaFireDetectorProcess(
-            #     "process" + str(cs),
-            #     shmem_name=shmem_name,
-            #     n_buffer=shmem_rignbuffer_size,
-            #     image_dimensions=shmem_image_dimensions
-            # )
+            print(f"shmem name is {shmem_name} for process number {cs} ")
+            process = QValkkaFireDetectorProcess(
+                "process" + str(cs),
+                shmem_name=shmem_name,
+                n_buffer=shmem_rignbuffer_size,
+                image_dimensions=shmem_image_dimensions
+            )
 
-            # self.fire_processes.append(process)
+            self.fire_processes.append(process)
             process = QValkkaFallDetection(
                 "process" + str(cs),
                 shmem_name=shmem_name,
@@ -118,7 +118,7 @@ class MyGui(QtWidgets.QMainWindow):
 
         # Give the multiprocesses to a gthread that's reading their message / thread will be listening to the processes !?
 
-        all_processes = self.robbery_processes + self.fall_processes
+        all_processes = self.robbery_processes + self.fall_processes + self.fire_processes
 
         self.thread = QValkkaThread(processes=all_processes)
 
@@ -214,10 +214,10 @@ class MyGui(QtWidgets.QMainWindow):
             tokens.append(token)
 
             # take corresponding multiprocess
-            # process = self.fire_processes[cc]
-            # process.createClient()  # creates the shared memory client at the multiprocess
+            process = self.fire_processes[cc]
+            process.createClient()  # creates the shared memory client at the multiprocess
             # # connect signals to the nested widget
-            # process.signals.Fire_detected.connect(self.fireAlert)
+            process.signals.Fire_detected.connect(self.fireAlert)
 
             process = self.fall_processes[cc]
             process.createClient()
@@ -237,16 +237,16 @@ class MyGui(QtWidgets.QMainWindow):
 
     def startProcesses(self):
         self.thread.start()
-        # for p in self.fire_processes:
-        #     p.start()
+        for p in self.fire_processes:
+            p.start()
         for p in self.fall_processes:
             p.start()
         for p in self.robbery_processes:
             p.start()
 
     def stopProcesses(self):
-        # for p in self.fire_processes:
-        #     p.stop()
+        for p in self.fire_processes:
+            p.stop()
         for p in self.fall_processes:
             p.stop()
         for p in self.robbery_processes:
@@ -284,7 +284,7 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.104.19:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.72:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}
