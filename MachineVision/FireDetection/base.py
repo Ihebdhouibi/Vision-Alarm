@@ -152,14 +152,17 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                                                videoName="Fire_Alert",
                                                width=img_width,
                                                height=img_height,
-                                               fps=30) + "}"
+                                               fps=20) + "}"
                         alertTime = "{" + str(datetime.today()) + " " + datetime.now().strftime("%H:%M:%S") + "}"
 
                         # storing the alert
-                        storeFireAlertData(alertTime=alertTime,
+                        try:
+                            storeFireAlertData(alertTime=alertTime,
                                            videoLink=videolink,
                                            AlertClass=True)
-                        self.alert = False
+                            self.alert = False
+                        except Exception as e:
+                            print("There is a problem storing alert in Fire_Alerts : ",str(e))
 
                         print("Video link : ",videolink)
 
@@ -167,9 +170,9 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                               "Check the following link to view it" \
                               f"{videolink}"
 
-                        phone = +21652562136
+                        phone = '+21652562136'
 
-                        send_sms(msg=msg, phone=phone)
+                        # send_sms(msg=msg, phone=phone)
     # ** frontend methods handling received outgoing signals ***
                 print("num_noFire_Frame : ",self.num_noFire_Frame)
     def Fire_detected(self):

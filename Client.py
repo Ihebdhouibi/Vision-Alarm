@@ -284,8 +284,9 @@ class MyGui(QtWidgets.QMainWindow):
 
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.1.72:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.196.155:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.168.7.57:8080/h264_ulaw.sdp",
+                       "rtsp://iheb:iheb@192.168.196.155:8080/h264_ulaw.sdp",
+                       "rtsp://iheb:iheb@192.168.1.49:8080/h264_ulaw.sdp"],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}
