@@ -182,13 +182,13 @@ class QValkkaRobberyDetectorProcess(QValkkaOpenCVProcess):
                 print("img : ",type(img))
                 print("img_array : ",type(img_array))
                 # print(img_array)
-                try:
-                    predictions = self.RobberyDetector.predict(img_array)
-                    print("preds :",predictions)
-                    score = predictions[0]
-                    print("this image is %.2f No Robber and %.2f Robbery" %(100 * (1-score), 100 * score))
-                except Exception as e:
-                    print("Unable to predict image class : "+str(e))
+                # try:
+                #     predictions = self.RobberyDetector.predict(img_array)
+                #     print("preds :",predictions)
+                #     score = predictions[0]
+                #     print("this image is %.2f No Robber and %.2f Robbery" %(100 * (1-score), 100 * score))
+                # except Exception as e:
+                #     print("Unable to predict image class : "+str(e))
     # ** frontend methods handling received outgoing signals ***
 
     def Robbery_detected(self):
