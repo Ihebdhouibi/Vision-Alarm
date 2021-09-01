@@ -13,7 +13,6 @@ from MachineVision.RobberyDetection import QValkkaRobberyDetectorProcess
 from multiprocess import QValkkaThread
 from Streaming.ForeignWidget import WidgetPair, TestWidget0
 
-
 setValkkaLogLevel(loglevel_silent)
 
 
@@ -27,7 +26,6 @@ class MyGui(QtWidgets.QMainWindow):
             self.widget_pair = WidgetPair(self.widget, win_id, TestWidget0)
             self.video = self.widget_pair.getWidget()
             self.lay.addWidget(self.video)
-
 
         def getWindowId(self):
             return int(self.widget.winId())
@@ -85,18 +83,17 @@ class MyGui(QtWidgets.QMainWindow):
         self.fall_processes = []
         self.robbery_processes = []
 
-
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
             print(f"shmem name is {shmem_name} for process number {cs} ")
-            process = QValkkaFireDetectorProcess(
-                "process" + str(cs),
-                shmem_name=shmem_name,
-                n_buffer=shmem_rignbuffer_size,
-                image_dimensions=shmem_image_dimensions
-            )
-
-            self.fire_processes.append(process)
+            # process = QValkkaFireDetectorProcess(
+            #     "process" + str(cs),
+            #     shmem_name=shmem_name,
+            #     n_buffer=shmem_rignbuffer_size,
+            #     image_dimensions=shmem_image_dimensions
+            # )
+            #
+            # self.fire_processes.append(process)
             # process = QValkkaFallDetection(
             #     "process" + str(cs),
             #     shmem_name=shmem_name,
@@ -105,20 +102,20 @@ class MyGui(QtWidgets.QMainWindow):
             # )
             # self.fall_processes.append(process)
             #
-            # process = QValkkaRobberyDetectorProcess(
-            #     "process" + str(cs),
-            #     shmem_name= shmem_name,
-            #     n_buffer=shmem_rignbuffer_size,
-            #     image_dimensions=shmem_image_dimensions
-            # )
-            # self.robbery_processes.append(process)
+            process = QValkkaRobberyDetectorProcess(
+                "process" + str(cs),
+                shmem_name=shmem_name,
+                n_buffer=shmem_rignbuffer_size,
+                image_dimensions=shmem_image_dimensions
+            )
+            self.robbery_processes.append(process)
             cs += 1
         # print(self.fire_processes)
         # print(self.fall_processes)
 
         # Give the multiprocesses to a gthread that's reading their message / thread will be listening to the processes !?
 
-        all_processes =  self.fire_processes
+        all_processes = self.fire_processes + self.robbery_processes
 
         self.thread = QValkkaThread(processes=all_processes)
 
@@ -160,7 +157,7 @@ class MyGui(QtWidgets.QMainWindow):
         cam_count = 0
         a = self.pardic["dec affinity start"]
 
-        mysignals = ["Fire_detected", "Fall_detected"]
+        # mysignals = ["Fire_detected", "Fall_detected", "Robbery_detected"]
         for address in self.addresses:
 
             # Livethread/openglthread are running
@@ -193,16 +190,15 @@ class MyGui(QtWidgets.QMainWindow):
                 address=address,
                 slot=cs,
                 shmem_name="camera" + str(cs),
-                shmem_image_dimensions= shmem_image_dimensions,
+                shmem_image_dimensions=shmem_image_dimensions,
                 shmem_image_interval=shmem_image_interval,
-                shmem_ringbuffer_size= shmem_rignbuffer_size,
-                msreconnect = 10000
+                shmem_ringbuffer_size=shmem_rignbuffer_size,
+                msreconnect=10000
             )
             self.chains.append(chain)
 
             win_id = self.openglthread.createWindow(show=False)
             frame = self.QtFrame(self.w, win_id)
-
 
             # print('setting up layout')
             if y > 1:
@@ -214,43 +210,44 @@ class MyGui(QtWidgets.QMainWindow):
             tokens.append(token)
 
             # take corresponding multiprocess
-            process = self.fire_processes[cc]
-            process.createClient()  # creates the shared memory client at the multiprocess
+            # process = self.fire_processes[cc]
+            # process.createClient()  # creates the shared memory client at the multiprocess
             # # connect signals to the nested widget
-            process.signals.Fire_detected.connect(self.fireAlert)
+            # process.signals.Fire_detected.connect(self.fireAlert)
 
             # process = self.fall_processes[cc]
             # process.createClient()
             # process.signals.Fall_detected.connect(self.fallAlert)
-            #
-            # process = self.robbery_processes[cc]
-            # process.createClient()
+
+            process = self.robbery_processes[cc]
+            try:
+                process.createClient()
+            except Exception as e:
+                print("Cannot create Robbery client : "+str(e))
             # Create signal/slot connection
-            # process.signals.Robbery_detected.connect(self.robberyAlert)
+            process.signals.Robbery_detected.connect(self.robberyAlert)
 
             chain.decodingOn()  # start the decoding thread
             cs += 1
             a += 1
             cc += 1
 
-
-
     def startProcesses(self):
         self.thread.start()
-        for p in self.fire_processes:
-            p.start()
+        # for p in self.fire_processes:
+        #     p.start()
         # for p in self.fall_processes:
         #     p.start()
-        # for p in self.robbery_processes:
-        #     p.start()
+        for p in self.robbery_processes:
+            p.start()
 
     def stopProcesses(self):
-        for p in self.fire_processes:
-            p.stop()
+        # for p in self.fire_processes:
+        #     p.stop()
         # for p in self.fall_processes:
         #     p.stop()
-        # for p in self.robbery_processes:
-        #     p.stop()
+        for p in self.robbery_processes:
+            p.stop()
         print("stopping QThread")
         self.thread.stop()
         print("QThread stopped")
@@ -266,11 +263,10 @@ class MyGui(QtWidgets.QMainWindow):
         self.openglthread.close()
 
     def closeEvent(self, e):
-        print("closeEvent!")
+        print("closeEvent !")
         self.stopProcesses()
         self.closeValkka()
         super().closeEvent()
-
 
     # Slot
     def fireAlert(self):
@@ -282,11 +278,16 @@ class MyGui(QtWidgets.QMainWindow):
         print("inside fallAlert slot method")
         self.alert.append('Fall detected on camera number 1 ')
 
+    def robberyAlert(self):
+        print("inside robberyAlert slot method ")
+        self.alert.append("Robbery detected on camera number 1 ")
+
+
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
-    pardic = {"cams": ["rtsp://iheb:iheb@192.168.7.57:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.196.155:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.1.49:8080/h264_ulaw.sdp"],
+    pardic = {"cams": ["rtsp://iheb:iheb@192.228.0.138:8080/h264_ulaw.sdp",
+                       "rtsp://iheb:iheb@192.168.20.118:8080/h264_ulaw.sdp",
+                       ],
               "live_affinity": -1,
               "dec affinity start": -1,
               "dec affinity stop": -1}

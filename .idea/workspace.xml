@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aa77dbc9-2a6e-4dfc-b550-fed1495be375" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MachineVision/FireDetection/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/FireDetection/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MachineVision/RobberyDetection/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/MachineVision/RobberyDetection/base.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -225,7 +227,14 @@
       <workItem from="1629796129781" duration="4484000" />
       <workItem from="1629806441838" duration="2246000" />
       <workItem from="1629808706004" duration="107000" />
-      <workItem from="1629809226425" duration="3928000" />
+      <workItem from="1629809226425" duration="4738000" />
+      <workItem from="1630323166556" duration="2662000" />
+      <workItem from="1630329616896" duration="2159000" />
+      <workItem from="1630333661436" duration="177000" />
+      <workItem from="1630354303133" duration="1601000" />
+      <workItem from="1630406934729" duration="11677000" />
+      <workItem from="1630501352655" duration="2392000" />
+      <workItem from="1630508578766" duration="712000" />
     </task>
     <servers />
   </component>
@@ -260,7 +269,7 @@
     <SUITE FILE_PATH="coverage/Vision_Alarm$gunDetector.coverage" NAME="gunDetector Coverage Results" MODIFIED="1628518534663" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Downloads/Theft-Detection-master (1)/Theft-Detection-master" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$test_studio_detector_2.coverage" NAME="test_studio_detector_2 Coverage Results" MODIFIED="1621807769527" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_2/qt" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$multiple_stream.coverage" NAME="multiple_stream Coverage Results" MODIFIED="1620001360530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/valkka-examples/api_level_1/qt" />
-    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1629817813802" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Vision_Alarm$Client.coverage" NAME="Client Coverage Results" MODIFIED="1630508948309" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Vision_Alarm$testopenpifpaf.coverage" NAME="testopenpifpaf Coverage Results" MODIFIED="1628519996540" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

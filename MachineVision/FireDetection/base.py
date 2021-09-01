@@ -75,7 +75,7 @@ class QValkkaFireDetectorProcess(QValkkaOpenCVProcess):
                 # print(self.pre, "Client timed out..")
                 pass
             else:
-                # print("Client index, size =", index, isize)
+                print("Client index, size =", index, isize)
                 try:
                     data = self.client.shmem_list[index]
                     # print(data)
