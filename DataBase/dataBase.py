@@ -66,7 +66,7 @@ def storeFallAlertData(alertTime, videoLink, AlertClass):
     conn.close()
 
 
-def storeMouvementAlertData(alertTime, videoLink, AlertClass):
+def storeRobberyAlertData(alertTime, videoLink, AlertClass):
     """
 
     TODO: develop a method that stores data alert in AlertsTable
@@ -94,7 +94,7 @@ def storeMouvementAlertData(alertTime, videoLink, AlertClass):
 
     # Connection achieved
     # Storing alert data
-    query = "insert into mouvement_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
+    query = "insert into robbery_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
 
     cursor.execute(query, (alertTime, videoLink, AlertClass))
     conn.commit()
@@ -103,11 +103,92 @@ def storeMouvementAlertData(alertTime, videoLink, AlertClass):
     conn.close()
 
 
-def retrieveAlertData():
+def retrieve_fire_alerts():
     """
     TODO: develop a method that fetch data from AlertsTables
     """
+    try:
+        conn = psycopg2.connect(host="127.0.0.1",
+                                user="postgres",
+                                database="visionalarm",
+                                password="root",
+                                port="5432")
+        cursor = conn.cursor()
+        print("Connection settings : ", conn.get_dsn_parameters())
+    except (Exception, psycopg2.Error) as error:
+        print("Error while trying to connect to PostgreSQL ",error)
 
+    #
+    query = "select * from fire_alerts"
+    cursor.execute(query)
+    print("Fire alerts : \n ------------------------------------ \n")
+    fire_alerts = cursor.fetchall()
+    for row in fire_alerts:
+        print(f"ID : {row[0]} | alert time : {row[1]} | video link : {row[2]} | class : {row[3]}")
+
+
+def retrieve_fall_alerts():
+    """
+    TODO: develop a method that fetch data from AlertsTables
+    """
+    try:
+        conn = psycopg2.connect(host="127.0.0.1",
+                                user="postgres",
+                                database="visionalarm",
+                                password="root",
+                                port="5432")
+        cursor = conn.cursor()
+        print("Connection settings : ", conn.get_dsn_parameters())
+    except (Exception, psycopg2.Error) as error:
+        print("Error while trying to connect to PostgreSQL ", error)
+
+    #
+    query = "select * from fall_alerts"
+    cursor.execute(query)
+    print("Fall alerts : \n ------------------------------------ \n")
+    fall_alerts = cursor.fetchall()
+    for row in fall_alerts:
+        print(f"ID : {row[0]} | alert time : {row[1]} | video link : {row[2]} | class : {row[3]}")
+
+
+def retrieve_robbery_alerts():
+    """
+    TODO: develop a method that fetch data from AlertsTables
+    """
+    try:
+        conn = psycopg2.connect(host="127.0.0.1",
+                                user="postgres",
+                                database="visionalarm",
+                                password="root",
+                                port="5432")
+        cursor = conn.cursor()
+        print("Connection settings : ", conn.get_dsn_parameters())
+    except (Exception, psycopg2.Error) as error:
+        print("Error while trying to connect to PostgreSQL ", error)
+
+    #
+    query = "select * from robbery_alerts"
+    cursor.execute(query)
+    print("Robbery alerts : \n ------------------------------------ \n")
+    robbery_alerts = cursor.fetchall()
+    for row in robbery_alerts:
+        print(f"ID : {row[0]} | alert time : {row[1]} | video link : {row[2]} | class : {row[3]}")
+
+def retrieve_all_alerts():
+    try:
+        conn = psycopg2.connect(host="127.0.0.1",
+                                user="postgres",
+                                database="visionalarm",
+                                password="root",
+                                port="5432")
+        cursor = conn.cursor()
+        print("Connection settings : ", conn.get_dsn_parameters())
+    except (Exception, psycopg2.Error) as error:
+        print("Error while trying to connect to PostgreSQL ", error)
+
+    retrieve_fire_alerts()
+    retrieve_fall_alerts()
+    retrieve_robbery_alerts()
 
 # storeFireAlertData("{20:20:20}", "{link}", True)
 # storeMouvementAlertData("{20:20:20}", "{link}", True)

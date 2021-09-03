@@ -9,7 +9,7 @@ import torch.multiprocessing as mp
 from MachineVision.FireDetection import QValkkaFireDetectorProcess
 from MachineVision.FallDetection import QValkkaFallDetection
 from MachineVision.RobberyDetection import QValkkaRobberyDetectorProcess
-
+from DataBase import retrieve_fire_alerts
 from multiprocess import QValkkaThread
 from Streaming.ForeignWidget import WidgetPair, TestWidget0
 
@@ -48,9 +48,9 @@ class MyGui(QtWidgets.QMainWindow):
         self.setWindowTitle('Vision alarm system')
         self.resize(1200, 800)
 
-        self.menuBar().addMenu('Add Camera')
+        self.menuBar().
         self.menuBar().addMenu('Remove camera')
-
+        self.menuBar().addMenu('Alerts')
         self.main = QtWidgets.QWidget(self)
         self.setCentralWidget(self.main)
         self.w = QtWidgets.QWidget(self)
