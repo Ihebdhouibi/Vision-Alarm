@@ -48,7 +48,7 @@ class MyGui(QtWidgets.QMainWindow):
         self.setWindowTitle('Vision alarm system')
         self.resize(1200, 800)
 
-        self.menuBar().
+        self.menuBar().addMenu('Add Camera')
         self.menuBar().addMenu('Remove camera')
         self.menuBar().addMenu('Alerts')
         self.main = QtWidgets.QWidget(self)
