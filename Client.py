@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtGui
 
 from valkka.api2 import LiveThread, OpenGLThread
 from valkka.api2.chains import ShmemFilterchain
@@ -62,11 +62,15 @@ class MyGui(QtWidgets.QMainWindow):
 
         self.wlay = QtWidgets.QGridLayout(self.w)
         self.alert = QtWidgets.QTextEdit()
+        font = QtGui.QFont()
+        font.setPointSize(14)
+
+        self.alert.setFont(font)
 
         self.mainlay.addWidget(self.w, 75)
         self.mainlay.addWidget(self.alert, 25)
 
-        self.frames = []  # i currently don't know what it is used for
+        self.frames = []
         self.addresses = self.pardic["cams"]
         print(self.addresses)
 
@@ -86,14 +90,14 @@ class MyGui(QtWidgets.QMainWindow):
         for address in self.addresses:
             shmem_name = "camera" + str(cs)
             print(f"shmem name is {shmem_name} for process number {cs} ")
-            # process = QValkkaFireDetectorProcess(
-            #     "process" + str(cs),
-            #     shmem_name=shmem_name,
-            #     n_buffer=shmem_rignbuffer_size,
-            #     image_dimensions=shmem_image_dimensions
-            # )
-            #
-            # self.fire_processes.append(process)
+            process = QValkkaFireDetectorProcess(
+                "process" + str(cs),
+                shmem_name=shmem_name,
+                n_buffer=shmem_rignbuffer_size,
+                image_dimensions=shmem_image_dimensions
+            )
+
+            self.fire_processes.append(process)
             # process = QValkkaFallDetection(
             #     "process" + str(cs),
             #     shmem_name=shmem_name,
@@ -102,20 +106,20 @@ class MyGui(QtWidgets.QMainWindow):
             # )
             # self.fall_processes.append(process)
             #
-            process = QValkkaRobberyDetectorProcess(
-                "process" + str(cs),
-                shmem_name=shmem_name,
-                n_buffer=shmem_rignbuffer_size,
-                image_dimensions=shmem_image_dimensions
-            )
-            self.robbery_processes.append(process)
+            # process = QValkkaRobberyDetectorProcess(
+            #     "process" + str(cs),
+            #     shmem_name=shmem_name,
+            #     n_buffer=shmem_rignbuffer_size,
+            #     image_dimensions=shmem_image_dimensions
+            # )
+            # self.robbery_processes.append(process)
             cs += 1
         # print(self.fire_processes)
         # print(self.fall_processes)
 
         # Give the multiprocesses to a gthread that's reading their message / thread will be listening to the processes !?
 
-        all_processes = self.fire_processes + self.robbery_processes
+        all_processes = self.fire_processes
 
         self.thread = QValkkaThread(processes=all_processes)
 
@@ -210,22 +214,22 @@ class MyGui(QtWidgets.QMainWindow):
             tokens.append(token)
 
             # take corresponding multiprocess
-            # process = self.fire_processes[cc]
-            # process.createClient()  # creates the shared memory client at the multiprocess
+            process = self.fire_processes[cc]
+            process.createClient()  # creates the shared memory client at the multiprocess
             # # connect signals to the nested widget
-            # process.signals.Fire_detected.connect(self.fireAlert)
+            process.signals.Fire_detected.connect(self.fireAlert)
 
             # process = self.fall_processes[cc]
             # process.createClient()
             # process.signals.Fall_detected.connect(self.fallAlert)
 
-            process = self.robbery_processes[cc]
-            try:
-                process.createClient()
-            except Exception as e:
-                print("Cannot create Robbery client : "+str(e))
+            # process = self.robbery_processes[cc]
+            # try:
+            #     process.createClient()
+            # except Exception as e:
+            #     print("Cannot create Robbery client : "+str(e))
             # Create signal/slot connection
-            process.signals.Robbery_detected.connect(self.robberyAlert)
+            # process.signals.Robbery_detected.connect(self.robberyAlert)
 
             chain.decodingOn()  # start the decoding thread
             cs += 1
@@ -234,20 +238,20 @@ class MyGui(QtWidgets.QMainWindow):
 
     def startProcesses(self):
         self.thread.start()
-        # for p in self.fire_processes:
-        #     p.start()
+        for p in self.fire_processes:
+            p.start()
         # for p in self.fall_processes:
         #     p.start()
         for p in self.robbery_processes:
             p.start()
 
     def stopProcesses(self):
-        # for p in self.fire_processes:
-        #     p.stop()
+        for p in self.fire_processes:
+            p.stop()
         # for p in self.fall_processes:
         #     p.stop()
-        for p in self.robbery_processes:
-            p.stop()
+        # for p in self.robbery_processes:
+        #     p.stop()
         print("stopping QThread")
         self.thread.stop()
         print("QThread stopped")
@@ -271,7 +275,7 @@ class MyGui(QtWidgets.QMainWindow):
     # Slot
     def fireAlert(self):
         print('inside fireAlert slot method')
-        self.alert.append('Fire Detected on camera number 1')
+        self.alert.append('Fire Detected on camera number 3')
         pass
 
     def fallAlert(self):
@@ -286,7 +290,8 @@ class MyGui(QtWidgets.QMainWindow):
 def main():
     app = QtWidgets.QApplication(["Vision-Alarm-System"])
     pardic = {"cams": ["rtsp://iheb:iheb@192.228.0.138:8080/h264_ulaw.sdp",
-                       "rtsp://iheb:iheb@192.168.20.118:8080/h264_ulaw.sdp",
+                       "rtsp://iheb:iheb@192.168.1.209:8080/h264_ulaw.sdp",
+                       "rtsp://iheb:iheb@192.168.111.31:8080/h264_ulaw.sdp"
                        ],
               "live_affinity": -1,
               "dec affinity start": -1,

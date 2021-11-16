@@ -19,21 +19,20 @@ GET_IMAGE_TIMEOUT = 2
 SLEEP_BETWEEN_INTERACTIONS = 0.1
 SLEEP_BEFORE_MORE = 5
 IMAGE_QUALITY = 1024
-# search_terms = ["armed robbery",
-#                 "shop robbery",
-#                 "man wearing robber mask",
-#                 "man wearing robber mask and knife",
-#                 "shop armed looting",
-#                 ]
-# "persons",
-#                 "store customers",
-#                 "faces",
-# search_terms = [
-#                 "covid mask",
-#                 "person portrait",
-#                 "full body person portrait",
-#                 "person smiling"]
-search_terms = ["armed masked thief"]
+search_terms = ["armed robbery",
+                "shop robbery",
+                "man wearing robber mask",
+                "man wearing robber mask and knife",
+                "shop armed looting",
+
+                "persons",
+                "store customers",
+                "faces",
+                "covid mask",
+                "person portrait",
+                "full body person portrait",
+                "person smiling"]
+# search_terms = ["armed masked thief"]
 class timeout:
 
     def __init__(self, seconds= 1, error_message="Timeout"):

@@ -1,6 +1,16 @@
 import psycopg2
 from configparser import ConfigParser
 
+def add_user(username, password):
+    cursor, conn = connect()
+
+    query = "insert into users (username, password) values (%s, %s)"
+
+    cursor.execute(query, (username, password))
+    conn.commit()
+
+    conn.close()
+
 def connect():
     try:
         conn = psycopg2.connect(host="127.0.0.1",
@@ -139,3 +149,19 @@ def retrieve_all_alerts():
 
 # storeFireAlertData("{20:20:20}", "{link}", True)
 # storeMouvementAlertData("{20:20:20}", "{link}", True)
+
+def retrieve_users():
+    cursor, conn = connect()
+
+    query = "select * from users"
+    cursor.execute(query)
+
+    result = cursor.fetchall()
+    for row in result:
+        print(f"id {row[0]} | username : {row[1]}  | password : {row[2]}")
+
+    conn.close()
+
+# add_user("user", "user")
+
+# retrieve_users()
