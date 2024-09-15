@@ -8,6 +8,8 @@ from tqdm import tqdm
 from selenium import webdriver
 from PIL import Image
 import signal
+import platform
+import threading
 
 driver_path = '/home/iheb/chromedriver'
 output_path = 'data/images/robbery_images'
@@ -30,22 +32,40 @@ search_terms = ["armed robbery",
                 "full body person portrait",
                 "person smiling"]
 # search_terms = ["armed masked thief"]
+
+class TimeoutException(Exception):
+    pass
+
 class timeout:
 
     def __init__(self, seconds= 1, error_message="Timeout"):
         self.seconds = seconds
         self.error_message = error_message
-
+        self.os_is_windows = platform.system().lower == 'windows'
+    
     def handle_timeout(self, signum, frame):
         raise TimeoutError(self.error_message)
 
     def __enter__(self):
-        signal.signal(signal.SIGALRM, self.handle_timeout)
-        signal.alarm(self.seconds)
+        if self.os_is_windows:
+            # For better portability a timeout class for windows is needed
+            self.timer = threading.Timer(self.seconds, self._raise_timeout)
+            self.timer.start
+        else:
+            # Use signal for Unix-based systems
+            signal.signal(signal.SIGALRM, self.handle_timeout)
+            signal.alarm(self.seconds)
 
     def __exit__(self, type, value, traceback):
-        signal.alarm(0)
-
+        if self.os_is_windows:
+            # Cancel timer for windows
+            self.timer.cancel()
+        else:
+            # Disable Unix alarm
+            signal.alarm(0)
+            
+    def _raise_timeout(self):
+        raise TimeoutException(self.error_message)
 
 def fetch_image_urls(query: str,
                      max_links_to_fetch: int,
