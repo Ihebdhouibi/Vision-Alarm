@@ -26,22 +26,19 @@ def add_user(username, password):
 def add_camera(address, nom):
 
     with get_db_connection() as (cursor, conn):
-        query = "select * from cameras"
-        cursor.execute(query)
+        try:
+            query = "SELECT COUNT(*) FROM cameras"
+            cursor.execute(query)
+            number_cam = cursor.fetchone()[0]
 
-        result = cursor.fetchall()
-        number_cam = 0
-        for rows in result:
-            number_cam += 1
-
-        print("Number cameras = ", number_cam)
-
-        if number_cam < 4:
-            query = "insert into cameras (address, nom) values (%s, %s)"
-            cursor.execute(query, (address, nom))
-            conn.commit()
-        else:
-            print("Maximum number of cameras added already")
+            if number_cam < 4:
+                query = "INERT INTO cameras (address, nom) VALUES (%s, %s)"
+                cursor.execute(query, (address, nom))
+                conn.commit()
+            else:
+                print("Maximun number of cameras added already")
+        except Exception as e:
+            print(f"Error adding camera: {e}")
 
 def remove_camera(id):
     pass
@@ -79,9 +76,13 @@ def retrieve_users():
 
     # Establishing Connection to DB
     with get_db_connection() as (cursor, conn):
-        query = "select * from users"
-        cursor.execute(query)
-
-        result = cursor.fetchall()
-        for row in result:
-            print(f"id {row[0]} | username : {row[1]}  | password : {row[2]}")
+        try:
+            query = "select * from users"
+            cursor.execute(query)
+    
+            result = cursor.fetchall()
+            for row in result:
+                print(f"ID: {row[0]} | Username: {row[1]}")
+        except Exception as e:
+            print(f"Error retrieving users: {e}")
+        
