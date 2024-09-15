@@ -201,5 +201,5 @@ def search_download(search_term:str, config: ScraperConfig, target_path="data/im
 
 for term in config.search_terms:
     search_download(term,
-                    config.output_path,
-                    config.number_of_images)
+                    config
+                    )
