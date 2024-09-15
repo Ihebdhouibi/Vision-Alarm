@@ -189,7 +189,7 @@ def search_download(search_term:str, config: ScraperConfig, target_path="data/im
 
     # launch chrome
     with webdriver.Chrome(executable_path=config.driver_path) as wd:
-        res = fetch_image_urls(search_term, number_images, wd= wd, sleep_between_interactions=config.SLEEP_BETWEEN_INTERACTIONS)
+        res = fetch_image_urls(search_term, number_images, wd= wd, sleep_between_interactions=config.sleep_between_interactions)
 
     # download images
     if res is not None:
