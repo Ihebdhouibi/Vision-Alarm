@@ -86,3 +86,14 @@ def retrieve_users():
         except Exception as e:
             print(f"Error retrieving users: {e}")
         
+def remove_camera(camera_id):
+
+    with get_db_connection() as (cursor, conn):
+        
+        try:
+            query = "DELETE FROM cameras WHERE id = %s"
+            cursor.execute(query, (camera_id))
+            conn.commit()
+            print(f"Camera with ID {camera_id} removed successfully.")
+        except Exception as e:
+            print(f"Error removing camera: {e}")
