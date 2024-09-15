@@ -19,7 +19,7 @@ def get_db_connection():
 
 def add_user(username, password):
     with get_db_connection() as (cursor, conn):
-        query = "insert into users (username, password) values (%s, %s)"
+        query = "INSERT INTO users (username, password) VALUES (%s, %s)"
         cursor.execute(query, (username, password))
         conn.commit()    
     
@@ -32,7 +32,7 @@ def add_camera(address, nom):
             number_cam = cursor.fetchone()[0]
 
             if number_cam < 4:
-                query = "INERT INTO cameras (address, nom) VALUES (%s, %s)"
+                query = "INSERT INTO cameras (address, nom) VALUES (%s, %s)"
                 cursor.execute(query, (address, nom))
                 conn.commit()
             else:
@@ -92,7 +92,7 @@ def remove_camera(camera_id):
         
         try:
             query = "DELETE FROM cameras WHERE id = %s"
-            cursor.execute(query, (camera_id))
+            cursor.execute(query, (camera_id,))
             conn.commit()
             print(f"Camera with ID {camera_id} removed successfully.")
         except Exception as e:
