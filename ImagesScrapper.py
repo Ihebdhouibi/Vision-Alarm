@@ -20,7 +20,7 @@ class timeout:
     def __init__(self, seconds= 1, error_message="Timeout"):
         self.seconds = seconds
         self.error_message = error_message
-        self.os_is_windows = platform.system().lower == 'windows'
+        self.os_is_windows = platform.system().lower() == 'windows'
     
     def handle_timeout(self, signum, frame):
         raise TimeoutError(self.error_message)
