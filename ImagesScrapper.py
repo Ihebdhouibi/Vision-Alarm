@@ -48,14 +48,14 @@ class timeout:
 
 class ScraperConfig:
 
-    def __init__(self, driver_path, output_path, number_of_images, get_image_timeout, sleep_between_interactions, slee_before_more
+    def __init__(self, driver_path, output_path, number_of_images, get_image_timeout, sleep_between_interactions, sleep_before_more
                      , image_quality, search_terms):
                      self.driver_path                = driver_path
                      self.output_path                = output_path
                      self.number_of_images           = number_of_images
                      self.get_image_timeout          = get_image_timeout
                      self.sleep_between_interactions = sleep_between_interactions
-                     self.sleep_before_more          = slee_before_more
+                     self.sleep_before_more          = sleep_before_more
                      self.image_quality              = image_quality
                      self.search_terms               = search_terms
 
@@ -162,7 +162,7 @@ def persist_image(folder_path:str,url:str, config: ScraperConfig):
     try:
         print("getting the image...")
         # download the image, if timeout is exceeded throw an error
-        with timeout(config.GET_IMAGE_TIMEOUT):
+        with timeout(config.get_image_timeout):
             image_content = requests.get(url).content
     except Exception as e:
         print(f"Error - Could not download {url} - {e}")
@@ -173,7 +173,7 @@ def persist_image(folder_path:str,url:str, config: ScraperConfig):
         file_path = os.path.join(folder_path, hashlib.sha1(image_content).hexdigest()[:10] + '.jpg')
 
         with open(file_path, 'wb') as f:
-            image.save(f, "JPEG", quality=config.IMAGE_QUALITY)
+            image.save(f, "JPEG", quality=config.image_quality)
         print(f"Success - Saved {url} - as {file_path} ")
 
     except Exception as e:
