@@ -22,14 +22,13 @@ def init_blob_client():
 
     return blob_service_client
 
-def create_azure_container():
+def create_azure_container(container_name = "alerts"):
 
     blob_service_client = init_blob_client()
-
-    container_name = "alerts"
-
-    container_client = blob_service_client.create_container(container_name)
-
+    try:
+        container_client = blob_service_client.create_container(container_name)
+    except Exception as e:
+        print(f"Error creating container {container_name}: {e}")
 
 def upload_blob(videoArray, videoName, width, height, fps):
 
