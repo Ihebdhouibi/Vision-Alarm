@@ -111,9 +111,6 @@ def retrieve_all_alerts():
     retrieve_fall_alerts()
     retrieve_robbery_alerts()
     
-# storeFireAlertData("{20:20:20}", "{link}", True)
-# storeMouvementAlertData("{20:20:20}", "{link}", True)
-
 def retrieve_users():
 
     # Establishing Connection to DB
@@ -124,9 +121,3 @@ def retrieve_users():
         result = cursor.fetchall()
         for row in result:
             print(f"id {row[0]} | username : {row[1]}  | password : {row[2]}")
-
-
-
-# add_user("user", "user")
-
-# retrieve_users()
