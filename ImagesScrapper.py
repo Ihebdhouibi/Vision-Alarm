@@ -1,5 +1,6 @@
 import hashlib
 import time
+import io
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -10,28 +11,6 @@ from PIL import Image
 import signal
 import platform
 import threading
-
-driver_path = '/home/iheb/chromedriver'
-output_path = 'data/images/robbery_images'
-number_of_images = 1000
-GET_IMAGE_TIMEOUT = 2
-SLEEP_BETWEEN_INTERACTIONS = 0.1
-SLEEP_BEFORE_MORE = 5
-IMAGE_QUALITY = 1024
-search_terms = ["armed robbery",
-                "shop robbery",
-                "man wearing robber mask",
-                "man wearing robber mask and knife",
-                "shop armed looting",
-
-                "persons",
-                "store customers",
-                "faces",
-                "covid mask",
-                "person portrait",
-                "full body person portrait",
-                "person smiling"]
-# search_terms = ["armed masked thief"]
 
 class TimeoutException(Exception):
     pass
@@ -67,14 +46,49 @@ class timeout:
     def _raise_timeout(self):
         raise TimeoutException(self.error_message)
 
+class ScraperConfig:
+
+    def __init__(self, driver_path, output_path, number_of_images, get_image_timeout, sleep_between_interactions, slee_before_more
+                     , image_quality, search_terms):
+                     self.driver_path                = driver_path
+                     self.output_path                = output_path
+                     self.number_of_images           = number_of_images
+                     self.get_image_timeout          = get_image_timeout
+                     self.sleep_between_interactions = sleep_between_interactions
+                     self.sleep_before_more          = slee_before_more
+                     self.image_quality              = image_quality
+                     self.search_terms               = search_terms
+
+config = ScraperConfig(    
+    driver_path = '/home/iheb/chromedriver',
+    output_path = 'data/images/robbery_images',
+    number_of_images = 1000,
+    GET_IMAGE_TIMEOUT = 2,
+    SLEEP_BETWEEN_INTERACTIONS = 0.1,
+    SLEEP_BEFORE_MORE = 5,
+    IMAGE_QUALITY = 1024,
+    search_terms = ["armed robbery",
+                    "shop robbery",
+                    "man wearing robber mask",
+                    "man wearing robber mask and knife",
+                    "shop armed looting",
+                    "persons",
+                    "store customers",
+                    "faces",
+                    "covid mask",
+                    "person portrait",
+                    "full body person portrait",
+                    "person smiling"]
+    )
+
 def fetch_image_urls(query: str,
                      max_links_to_fetch: int,
                      wd: webdriver,
-                     sleep_between_interactions: int = 1):
+                     config: ScraperConfig):
 
     def scroll_to_end(wd):
         wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(sleep_between_interactions)
+        time.sleep(config.sleep_between_interactions)
 
     # building google query
     search_url = "https://www.google.com/search?safe=off&site=&tbm=isch&source=hp&q={q}&oq={q}&gs_l=img"
@@ -100,7 +114,7 @@ def fetch_image_urls(query: str,
             # try to click every thumbnail such that we can get the real image behind it
             try:
                 img.click()
-                time.sleep(sleep_between_interactions)
+                time.sleep(config.sleep_between_interactions)
             except Exception as e:
                 print(f"could not click image - {e}")
                 continue
@@ -144,11 +158,11 @@ def fetch_image_urls(query: str,
 
     return image_urls
 
-def persist_image(folder_path:str, url:str):
+def persist_image(folder_path:str,url:str, config: ScraperConfig):
     try:
         print("getting the image...")
         # download the image, if timeout is exceeded throw an error
-        with timeout(GET_IMAGE_TIMEOUT):
+        with timeout(config.GET_IMAGE_TIMEOUT):
             image_content = requests.get(url).content
     except Exception as e:
         print(f"Error - Could not download {url} - {e}")
@@ -159,14 +173,13 @@ def persist_image(folder_path:str, url:str):
         file_path = os.path.join(folder_path, hashlib.sha1(image_content).hexdigest()[:10] + '.jpg')
 
         with open(file_path, 'wb') as f:
-            image.save(f, "JPEG", quality=IMAGE_QUALITY)
+            image.save(f, "JPEG", quality=config.IMAGE_QUALITY)
         print(f"Success - Saved {url} - as {file_path} ")
 
     except Exception as e:
         print(f"Error - could not save {url} - {e}")
 
-def search_download(search_term:str, target_path="data/images/robbery_images", number_images=5):
-
+def search_download(search_term:str, config: ScraperConfig, target_path="data/images/robbery_images", number_images=5):
     # create a folder name
     target_folder = os.path.join(target_path, '_'.join(search_term.lower().split(" ")))
 
@@ -175,8 +188,8 @@ def search_download(search_term:str, target_path="data/images/robbery_images", n
         os.makedirs(target_folder)
 
     # launch chrome
-    with webdriver.Chrome(executable_path=driver_path) as wd:
-        res = fetch_image_urls(search_term, number_images, wd= wd, sleep_between_interactions=SLEEP_BETWEEN_INTERACTIONS)
+    with webdriver.Chrome(executable_path=config.driver_path) as wd:
+        res = fetch_image_urls(search_term, number_images, wd= wd, sleep_between_interactions=config.SLEEP_BETWEEN_INTERACTIONS)
 
     # download images
     if res is not None:
@@ -186,7 +199,7 @@ def search_download(search_term:str, target_path="data/images/robbery_images", n
         print(f"failed to return links for terms :   {search_term}")
 
 
-for term in search_terms:
+for term in config.search_terms:
     search_download(term,
-                    output_path,
-                    number_of_images)
+                    config.output_path,
+                    config.number_of_images)
