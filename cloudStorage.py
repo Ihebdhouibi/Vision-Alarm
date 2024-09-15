@@ -2,7 +2,7 @@ import os, uuid, time
 from datetime import datetime
 
 import cv2
-import numpy as np
+import tempfile
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
 
 
@@ -30,35 +30,34 @@ def create_azure_container(container_name = "alerts"):
     except Exception as e:
         print(f"Error creating container {container_name}: {e}")
 
-def upload_blob(videoArray, videoName, width, height, fps):
+def upload_blob(video_array, video_name, width, height, fps):
 
     blob_service_client = init_blob_client()
-    current_time = datetime.now()
-    current_day = datetime.today()
-    current_time = current_time.strftime("%H:%M:%S")
-    videoName = videoName + " " + str(current_day) + " "+ current_time + ".mp4"
-    blob_client = blob_service_client.get_blob_client(container="alerts", blob=videoName)
+    current_time = datetime.now().strftime("%H:%M:%S")
+    current_day = datetime.today().strftime("%Y-%m-%d")
+    
+    video_name = f"{video_name} {current_day} {current_time}.mp4"
+    blob_client = blob_service_client.get_blob_client(container="alerts", blob=video_name)
 
-    # Converting videoArray ( numpy array ) into video
-    # fps = 30 # 25 frames per second
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as temp_video_file:
+            output = cv2.VideoWriter(temp_video_file.name, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height), True)
+            for i in video_array:
+                output.write(i)
+            output.release()
 
+            with open(temp_video_file.name, "rb") as data:
+                # Uploading video to the cloud
+                blob_client.upload_blob(data)
 
-    # print(videoName)
-    output = cv2.VideoWriter(videoName, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height), True)
-    for i in videoArray:
-        output.write(i)
-    output.release()
+        os.remove(temp_video_file.name) # removing temporary file after upload
+        return blob_client.url
+    
+    except Exception as e:
+        print(f"Error uploading video {video_name}: {e}")
+        return None
 
-    path = "./" + videoName
-    # print("path : ", path)
-    with open(path, "rb") as data :
-        # Uploading video to the cloud
-        blob_client.upload_blob(data)
-    # Delete file after upload
-
-    os.remove(path)
-
-    return blob_client.url
+    
 
 
 
