@@ -6,7 +6,7 @@ import numpy as np
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, __version__
 
 
-def initBlogClient():
+def init_blob_client():
     """
     Initialize the blob service from Azure storage connection string.
 
@@ -22,18 +22,18 @@ def initBlogClient():
 
     return blob_service_client
 
-def createAzureContainer():
+def create_azure_container():
 
-    blob_service_client = initBlogClient()
+    blob_service_client = init_blob_client()
 
     container_name = "alerts"
 
     container_client = blob_service_client.create_container(container_name)
 
 
-def uploadBlob(videoArray, videoName, width, height, fps):
+def upload_blob(videoArray, videoName, width, height, fps):
 
-    blob_service_client = initBlogClient()
+    blob_service_client = init_blob_client()
     current_time = datetime.now()
     current_day = datetime.today()
     current_time = current_time.strftime("%H:%M:%S")
