@@ -63,7 +63,7 @@ class timeout:
         else:
             # Disable Unix alarm
             signal.alarm(0)
-            
+
     def _raise_timeout(self):
         raise TimeoutException(self.error_message)
 
@@ -190,56 +190,3 @@ for term in search_terms:
     search_download(term,
                     output_path,
                     number_of_images)
-
-# search_term = "dog"
-# search_download(search_term=search_term,
-#                 driver_path=driver_path,
-#                 target_path="data/images/robbery_images")
-# def ImageScrapper(url):
-#
-#     response = requests.get(url)
-#     soup = BeautifulSoup(response.content, 'html.parser')
-#     base_link = ''
-#     index = 0
-#     # for item in soup.find_all('img'):
-#     #     img_link = item.attrs['src']
-#     #     index += 1
-#     #     print(f"image number : {index} link : {img_link}")
-#     #
-#     #     full_url = url + img_link
-#     #
-#     #     r = requests.get(full_url,
-#     #                      stream=True)
-#     #     print(f"code : {r.status_code}")
-#     #     print(r.raw)
-#     #     if r.status_code == 200:
-#     #         print(f"everything is okkay for image number {index}")
-#     #         with open("data/images/robbery_images/img" +str(index)+ ".jpg", 'wb') as f:
-#     #             r.raw.decode_content = True
-#     #             shutil.copyfileobj(r.raw, f)
-#
-#     images = soup.find_all('img')
-#     print(images[0])
-#     img_src = images[0].attrs['src']
-#     full_link = url + img_src
-#     print(full_link)
-#
-#     split_string = img_src.split(".",1)
-#     print(split_string[1])
-#
-#     r = requests.get(full_link, stream=True)
-#     if r.status_code == 200:
-#         with open("data/images/robbery_images/img"+str(index)+"."+str(split_string[1]) , "wb") as f:
-#             r.raw.decode_content = True
-#             shutil.copyfileobj(r.raw, f)
-# ImageScrapper("https://www.google.com/search?q=armed+robbery+jpg&tbm=isch&client=opera&hs=Gao&hl=en&sa=X&ved=2ahUKEwjMmPa8s6byAhVaO-wKHXmYAQYQBXoECAEQIw&biw=1865&bih=952")
-
-
-# def getData(url):
-#     r = requests.get(url)
-#     return r.text
-#
-# htmldata = getData("https://www.istockphoto.com/photos/armed-robbery")
-# soup = BeautifulSoup(htmldata, 'html.parser')
-# for item in soup.find_all('img'):
-#     print(item['src'])
