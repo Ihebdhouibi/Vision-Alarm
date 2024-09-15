@@ -8,10 +8,15 @@ from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, _
 
 def initBlogClient():
     """
-    TODO: remove cloud connection string
+    Initialize the blob service from Azure storage connection string.
 
+    Ensures connection string is retrieved securely from env variables.
     """
+
     connect_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+
+    if not connect_string:
+        raise EnvironmentError("AZURE_STORAGE_CONNECTION_STRING env variable not set.")
 
     blob_service_client = BlobServiceClient.from_connection_string(connect_string)
 
