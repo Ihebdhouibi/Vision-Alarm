@@ -179,7 +179,7 @@ def persist_image(folder_path:str,url:str, config: ScraperConfig):
     except Exception as e:
         print(f"Error - could not save {url} - {e}")
 
-def search_download(search_term:str, config: ScraperConfig, target_path="data/images/robbery_images", number_images=5):
+def search_download(search_term:str, config: ScraperConfig, target_path: str, number_images: int):
     # create a folder name
     target_folder = os.path.join(target_path, '_'.join(search_term.lower().split(" ")))
 
@@ -201,5 +201,7 @@ def search_download(search_term:str, config: ScraperConfig, target_path="data/im
 
 for term in config.search_terms:
     search_download(term,
-                    config
+                    config,
+                    config.output_path,
+                    config.number_of_images
                     )
