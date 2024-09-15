@@ -29,7 +29,7 @@ class timeout:
         if self.os_is_windows:
             # For better portability a timeout class for windows is needed
             self.timer = threading.Timer(self.seconds, self._raise_timeout)
-            self.timer.start
+            self.timer.start()
         else:
             # Use signal for Unix-based systems
             signal.signal(signal.SIGALRM, self.handle_timeout)
