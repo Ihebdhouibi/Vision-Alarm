@@ -60,24 +60,5 @@ def upload_blob(videoArray, videoName, width, height, fps):
 
     return blob_client.url
 
-# frames = []
-# path = "./data/test.mp4"
-#
-# cap = cv2.VideoCapture(path)
-#
-# if cap.isOpened():
-#     width = int(cap.get(3))
-#     height = int(cap.get(4))
-# print("width : ", width)
-# print("height : ", height)
-# ret = True
-# while ret:
-#     ret, img = cap.read()
-#     if ret:
-#         frames.append(img)
-# video = np.stack(frames, axis = 0)
-#
-# # print(video)
-#
-# print(uploadBlob(video, "Alert", width, height))
+
 
