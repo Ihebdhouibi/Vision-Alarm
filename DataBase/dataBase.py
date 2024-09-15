@@ -46,30 +46,15 @@ def add_camera(address, nom):
 def remove_camera(id):
     pass
 
+def store_alert_data(alert_time, video_link, alert_class, alert_type):
+    query = f"INSERT INTO {alert_type}_alerts (alert_time, video_link, class) VALUES (%s, %s, %s)"
 
-def storeFireAlertData(alertTime, videoLink, AlertClass):
-
-    # Establishing Connection to DB
     with get_db_connection() as (cursor, conn):
-        query = "insert into fire_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
-        cursor.execute(query, (alertTime, videoLink, AlertClass))
-        conn.commit()
-
-def storeFallAlertData(alertTime, videoLink, AlertClass):
-
-    # Establishing Connection to DB
-    with get_db_connection() as (cursor, conn):
-        query = "insert into fall_alerts (alert_time, video_link, class) values (%s, %s, %s)"
-        cursor.execute(query, (alertTime, videoLink, AlertClass))
-        conn.commit()
-
-def storeRobberyAlertData(alertTime, videoLink, AlertClass):
-
-    # Establishing Connection to DB
-    with get_db_connection() as (cursor, conn):
-        query = "insert into robbery_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
-        cursor.execute(query, (alertTime, videoLink, AlertClass))
-        conn.commit()
+        try:
+            cursor.execute(query, (alert_time, video_link, alert_class))
+            conn.commit()
+        except Exception as e:
+            print(f"Error inserting alert into {alert_type}_alerts: {e}")
 
 def retrieve_fire_alerts():
 
