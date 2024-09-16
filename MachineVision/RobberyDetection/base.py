@@ -90,6 +90,7 @@ import cv2
 import time
 import tensorflow as tf
 import numpy as np
+import logging
 from PIL import Image
 from keras.models import load_model
 from keras.preprocessing.image import img_to_array
@@ -143,24 +144,25 @@ class QValkkaRobberyDetectorProcess(QValkkaOpenCVProcess):
         self.RobberyDetector = load_model('/home/iheb/PycharmProjects/Vision-Alarm/MachineVision/RobberyDetection/Robbery_Detection_Model3.h5')
 
     def alarm(self):
-        print('Robbery Robbery')
+        
+        logging.debug(f"Robbery detected")
         self.sendSignal_(name="Robbery_detected")
 
     def cycle_(self):
-        # print('inside Robbery detection')
+        
         if self.client is None:
             time.sleep(1.0)
-            print('client timedout')
+            logging('client timedout')
         else:
             index, isize = self.client.pull()
             if (index is None):
-                # print(self.pre, "Client timed out..")
+                logging(f"{self.pre} Client timed out..")
                 pass
             else:
-                print("Client index, size =", index, isize)
+                logging(f"Client index: {index} size: {isize}")
                 try:
                     data = self.client.shmem_list[index]
-                    # print(data)
+                    
                 except BaseException:
                     print("There is an issue in getting data from shmem_list")
                 try:
@@ -173,25 +175,24 @@ class QValkkaRobberyDetectorProcess(QValkkaOpenCVProcess):
                 img_resized = cv2.resize(img, (224, 224))
                 img = Image.fromarray(img_resized)
 
-                print(img_resized.shape)
-                print(type(img_resized))
-                print(type(img))
+                logging(img_resized.shape)
+
                 img_array = img_to_array(img=img)
                 img_array = tf.expand_dims(img_array, 0)
 
-                print("img : ",type(img))
-                print("img_array : ",type(img_array))
-                # print(img_array)
-                # try:
-                #     predictions = self.RobberyDetector.predict(img_array)
-                #     print("preds :",predictions)
-                #     score = predictions[0]
-                #     print("this image is %.2f No Robber and %.2f Robbery" %(100 * (1-score), 100 * score))
-                # except Exception as e:
-                #     print("Unable to predict image class : "+str(e))
-    # ** frontend methods handling received outgoing signals ***
+                logging("img : ",type(img))
+                logging("img_array : ",type(img_array))
+
+                try:
+                    predictions = self.RobberyDetector.predict(img_array)
+                    logging("preds :",predictions)
+                    score = predictions[0]
+                    logging("This image is %.2f No Robber and %.2f Robbery" %(100 * (1-score), 100 * score))
+                except Exception as e:
+                     print(f"Unable to predict image class : {e}")
+    
 
     def Robbery_detected(self):
-        print("At frontend: Robbery detected ")
+        logging("At frontend: Robbery detected ")
         self.signals.Robbery_detected.emit()
 
