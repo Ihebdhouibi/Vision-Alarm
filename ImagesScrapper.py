@@ -1,63 +1,94 @@
 import hashlib
-import io
 import time
+import io
 import os
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
-import numpy as np
 import shutil
 from tqdm import tqdm
 from selenium import webdriver
 from PIL import Image
 import signal
+import platform
+import threading
 
-driver_path = '/home/iheb/chromedriver'
-output_path = 'data/images/robbery_images'
-number_of_images = 1000
-GET_IMAGE_TIMEOUT = 2
-SLEEP_BETWEEN_INTERACTIONS = 0.1
-SLEEP_BEFORE_MORE = 5
-IMAGE_QUALITY = 1024
-search_terms = ["armed robbery",
-                "shop robbery",
-                "man wearing robber mask",
-                "man wearing robber mask and knife",
-                "shop armed looting",
+class TimeoutException(Exception):
+    pass
 
-                "persons",
-                "store customers",
-                "faces",
-                "covid mask",
-                "person portrait",
-                "full body person portrait",
-                "person smiling"]
-# search_terms = ["armed masked thief"]
 class timeout:
 
     def __init__(self, seconds= 1, error_message="Timeout"):
         self.seconds = seconds
         self.error_message = error_message
-
+        self.os_is_windows = platform.system().lower() == 'windows'
+    
     def handle_timeout(self, signum, frame):
         raise TimeoutError(self.error_message)
 
     def __enter__(self):
-        signal.signal(signal.SIGALRM, self.handle_timeout)
-        signal.alarm(self.seconds)
+        if self.os_is_windows:
+            # For better portability a timeout class for windows is needed
+            self.timer = threading.Timer(self.seconds, self._raise_timeout)
+            self.timer.start()
+        else:
+            # Use signal for Unix-based systems
+            signal.signal(signal.SIGALRM, self.handle_timeout)
+            signal.alarm(self.seconds)
 
     def __exit__(self, type, value, traceback):
-        signal.alarm(0)
+        if self.os_is_windows:
+            # Cancel timer for windows
+            self.timer.cancel()
+        else:
+            # Disable Unix alarm
+            signal.alarm(0)
 
+    def _raise_timeout(self):
+        raise TimeoutException(self.error_message)
+
+class ScraperConfig:
+
+    def __init__(self, driver_path, output_path, number_of_images, get_image_timeout, sleep_between_interactions, sleep_before_more
+                     , image_quality, search_terms):
+                     self.driver_path                = driver_path
+                     self.output_path                = output_path
+                     self.number_of_images           = number_of_images
+                     self.get_image_timeout          = get_image_timeout
+                     self.sleep_between_interactions = sleep_between_interactions
+                     self.sleep_before_more          = sleep_before_more
+                     self.image_quality              = image_quality
+                     self.search_terms               = search_terms
+
+config = ScraperConfig(    
+    driver_path = '/home/iheb/chromedriver',
+    output_path = 'data/images/robbery_images',
+    number_of_images = 1000,
+    GET_IMAGE_TIMEOUT = 2,
+    SLEEP_BETWEEN_INTERACTIONS = 0.1,
+    SLEEP_BEFORE_MORE = 5,
+    IMAGE_QUALITY = 1024,
+    search_terms = ["armed robbery",
+                    "shop robbery",
+                    "man wearing robber mask",
+                    "man wearing robber mask and knife",
+                    "shop armed looting",
+                    "persons",
+                    "store customers",
+                    "faces",
+                    "covid mask",
+                    "person portrait",
+                    "full body person portrait",
+                    "person smiling"]
+    )
 
 def fetch_image_urls(query: str,
                      max_links_to_fetch: int,
                      wd: webdriver,
-                     sleep_between_interactions: int = 1):
+                     config: ScraperConfig):
 
     def scroll_to_end(wd):
         wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(sleep_between_interactions)
+        time.sleep(config.sleep_between_interactions)
 
     # building google query
     search_url = "https://www.google.com/search?safe=off&site=&tbm=isch&source=hp&q={q}&oq={q}&gs_l=img"
@@ -83,7 +114,7 @@ def fetch_image_urls(query: str,
             # try to click every thumbnail such that we can get the real image behind it
             try:
                 img.click()
-                time.sleep(sleep_between_interactions)
+                time.sleep(config.sleep_between_interactions)
             except Exception as e:
                 print(f"could not click image - {e}")
                 continue
@@ -127,11 +158,11 @@ def fetch_image_urls(query: str,
 
     return image_urls
 
-def persist_image(folder_path:str, url:str):
+def persist_image(folder_path:str,url:str, config: ScraperConfig):
     try:
         print("getting the image...")
         # download the image, if timeout is exceeded throw an error
-        with timeout(GET_IMAGE_TIMEOUT):
+        with timeout(config.get_image_timeout):
             image_content = requests.get(url).content
     except Exception as e:
         print(f"Error - Could not download {url} - {e}")
@@ -142,14 +173,13 @@ def persist_image(folder_path:str, url:str):
         file_path = os.path.join(folder_path, hashlib.sha1(image_content).hexdigest()[:10] + '.jpg')
 
         with open(file_path, 'wb') as f:
-            image.save(f, "JPEG", quality=IMAGE_QUALITY)
+            image.save(f, "JPEG", quality=config.image_quality)
         print(f"Success - Saved {url} - as {file_path} ")
 
     except Exception as e:
         print(f"Error - could not save {url} - {e}")
 
-def search_download(search_term:str, target_path="data/images/robbery_images", number_images=5):
-
+def search_download(search_term:str, config: ScraperConfig, target_path: str, number_images: int):
     # create a folder name
     target_folder = os.path.join(target_path, '_'.join(search_term.lower().split(" ")))
 
@@ -158,8 +188,8 @@ def search_download(search_term:str, target_path="data/images/robbery_images", n
         os.makedirs(target_folder)
 
     # launch chrome
-    with webdriver.Chrome(executable_path=driver_path) as wd:
-        res = fetch_image_urls(search_term, number_images, wd= wd, sleep_between_interactions=SLEEP_BETWEEN_INTERACTIONS)
+    with webdriver.Chrome(executable_path=config.driver_path) as wd:
+        res = fetch_image_urls(search_term, number_images, wd= wd, sleep_between_interactions=config.sleep_between_interactions)
 
     # download images
     if res is not None:
@@ -169,60 +199,9 @@ def search_download(search_term:str, target_path="data/images/robbery_images", n
         print(f"failed to return links for terms :   {search_term}")
 
 
-for term in search_terms:
+for term in config.search_terms:
     search_download(term,
-                    output_path,
-                    number_of_images)
-
-# search_term = "dog"
-# search_download(search_term=search_term,
-#                 driver_path=driver_path,
-#                 target_path="data/images/robbery_images")
-# def ImageScrapper(url):
-#
-#     response = requests.get(url)
-#     soup = BeautifulSoup(response.content, 'html.parser')
-#     base_link = ''
-#     index = 0
-#     # for item in soup.find_all('img'):
-#     #     img_link = item.attrs['src']
-#     #     index += 1
-#     #     print(f"image number : {index} link : {img_link}")
-#     #
-#     #     full_url = url + img_link
-#     #
-#     #     r = requests.get(full_url,
-#     #                      stream=True)
-#     #     print(f"code : {r.status_code}")
-#     #     print(r.raw)
-#     #     if r.status_code == 200:
-#     #         print(f"everything is okkay for image number {index}")
-#     #         with open("data/images/robbery_images/img" +str(index)+ ".jpg", 'wb') as f:
-#     #             r.raw.decode_content = True
-#     #             shutil.copyfileobj(r.raw, f)
-#
-#     images = soup.find_all('img')
-#     print(images[0])
-#     img_src = images[0].attrs['src']
-#     full_link = url + img_src
-#     print(full_link)
-#
-#     split_string = img_src.split(".",1)
-#     print(split_string[1])
-#
-#     r = requests.get(full_link, stream=True)
-#     if r.status_code == 200:
-#         with open("data/images/robbery_images/img"+str(index)+"."+str(split_string[1]) , "wb") as f:
-#             r.raw.decode_content = True
-#             shutil.copyfileobj(r.raw, f)
-# ImageScrapper("https://www.google.com/search?q=armed+robbery+jpg&tbm=isch&client=opera&hs=Gao&hl=en&sa=X&ved=2ahUKEwjMmPa8s6byAhVaO-wKHXmYAQYQBXoECAEQIw&biw=1865&bih=952")
-
-
-# def getData(url):
-#     r = requests.get(url)
-#     return r.text
-#
-# htmldata = getData("https://www.istockphoto.com/photos/armed-robbery")
-# soup = BeautifulSoup(htmldata, 'html.parser')
-# for item in soup.find_all('img'):
-#     print(item['src'])
+                    config,
+                    config.output_path,
+                    config.number_of_images
+                    )

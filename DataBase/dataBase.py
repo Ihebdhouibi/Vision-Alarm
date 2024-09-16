@@ -1,17 +1,9 @@
 import psycopg2
 from configparser import ConfigParser
+from contextlib import contextmanager
 
-def add_user(username, password):
-    cursor, conn = connect()
-
-    query = "insert into users (username, password) values (%s, %s)"
-
-    cursor.execute(query, (username, password))
-    conn.commit()
-
-    conn.close()
-
-def connect():
+@contextmanager
+def get_db_connection():
     try:
         conn = psycopg2.connect(host="127.0.0.1",
                                 user="postgres",
@@ -19,149 +11,89 @@ def connect():
                                 password="root",
                                 port="5432")
         cursor = conn.cursor()
-        # print connexion settings
-        print("Connexion settings : ", conn.get_dsn_parameters())
-    except (Exception, psycopg2.Error) as error:
-        print("Error while trying to connect to PostgreSQL ", error)
+        yield cursor, conn
+    except Exception as error:
+        print(f"Error while connecting to PostgreSQL: {error}")
+    finally:
+        conn.close()
 
-    return cursor, conn
-
+def add_user(username, password):
+    with get_db_connection() as (cursor, conn):
+        query = "INSERT INTO users (username, password) VALUES (%s, %s)"
+        cursor.execute(query, (username, password))
+        conn.commit()    
+    
 def add_camera(address, nom):
 
-    cursor, conn = connect()
+    with get_db_connection() as (cursor, conn):
+        try:
+            query = "SELECT COUNT(*) FROM cameras"
+            cursor.execute(query)
+            number_cam = cursor.fetchone()[0]
 
-    query = "select * from cameras"
-    cursor.execute(query)
-
-    result = cursor.fetchall()
-    number_cam = 0
-    for rows in result:
-        number_cam += 1
-
-    print("Number cameras = ", number_cam)
-
-    if number_cam < 4:
-        query = "insert into cameras (address, nom) values (%s, %s)"
-        cursor.execute(query, (address, nom))
-        conn.commit()
-    else:
-        print("Maximum number of cameras added already")
-
-    conn.close()
+            if number_cam < 4:
+                query = "INSERT INTO cameras (address, nom) VALUES (%s, %s)"
+                cursor.execute(query, (address, nom))
+                conn.commit()
+            else:
+                print("Maximun number of cameras added already")
+        except Exception as e:
+            print(f"Error adding camera: {e}")
 
 def remove_camera(id):
     pass
 
+def store_alert_data(alert_time, video_link, alert_class, alert_type):
+    
+    query = f"INSERT INTO {alert_type}_alerts (alert_time, video_link, class) VALUES (%s, %s, %s)"
 
-def storeFireAlertData(alertTime, videoLink, AlertClass):
+    with get_db_connection() as (cursor, conn):
+        try:
+            cursor.execute(query, (alert_time, video_link, alert_class))
+            conn.commit()
+        except Exception as e:
+            print(f"Error inserting alert into {alert_type}_alerts: {e}")
 
-    cursor, conn = connect()
-    # Connection achieved
-    # Storing alert data
-    query = "insert into fire_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
+def retrieve_alerts(alert_type):
+    
+    query=f"SELECT * FROM {alert_type}_alerts"
 
-    cursor.execute(query, (alertTime, videoLink, AlertClass))
-    conn.commit()
-
-    # Close connection
-    conn.close()
-
-
-def storeFallAlertData(alertTime, videoLink, AlertClass):
-    # Try connection
-    cursor, conn = connect()
-    # Connection achieved
-    # Storing alert data
-    try:
-        query = "insert into fall_alerts (alert_time, video_link, class) values (%s, %s, %s)"
-
-        cursor.execute(query, (alertTime, videoLink, AlertClass))
-        conn.commit()
-    except Exception as e:
-        print("There is an issue inserting alert information into fall_alerts")
-    # close connection
-    conn.close()
-
-
-def storeRobberyAlertData(alertTime, videoLink, AlertClass):
-
-    cursor, conn = connect()
-    # Connection achieved
-    # Storing alert data
-    query = "insert into robbery_alerts (alert_time, video_link, class) values ( %s, %s, %s)"
-
-    cursor.execute(query, (alertTime, videoLink, AlertClass))
-    conn.commit()
-
-    # Close connection
-    conn.close()
-
-
-def retrieve_fire_alerts():
-
-    cursor, conn = connect()
-
-    query = "select * from fire_alerts"
-    cursor.execute(query)
-    print("Fire alerts : \n ------------------------------------ \n")
-    fire_alerts = cursor.fetchall()
-    for row in fire_alerts:
-        print(f"ID : {row[0]} | alert time : {row[1]} | video link : {row[2]} | class : {row[3]}")
-
-    conn.close()
-
-
-def retrieve_fall_alerts():
-
-    cursor, conn = connect()
-    query = "select * from fall_alerts"
-    cursor.execute(query)
-    print("Fall alerts : \n ------------------------------------ \n")
-    fall_alerts = cursor.fetchall()
-    for row in fall_alerts:
-        print(f"ID : {row[0]} | alert time : {row[1]} | video link : {row[2]} | class : {row[3]}")
-
-    conn.close()
-
-
-def retrieve_robbery_alerts():
-
-    cursor, conn = connect()
-
-    query = "select * from robbery_alerts"
-    cursor.execute(query)
-    print("Robbery alerts : \n ------------------------------------ \n")
-    robbery_alerts = cursor.fetchall()
-    for row in robbery_alerts:
-        print(f"ID : {row[0]} | alert time : {row[1]} | video link : {row[2]} | class : {row[3]}")
-
-    conn.close()
-
+    with get_db_connection() as (cursor, conn):
+        cursor.execute(query)
+        alerts = cursor.fetchall()
+        print(f"{alert_type.capitalize()} alerts: \n ----------------------------------------------- \n")
+        
+        for row in alerts:
+            print(f"ID: {row[0]} | Alert Time: {row[1]} | Video Link; {row[2]} | Class: {row[3]}")
 
 def retrieve_all_alerts():
 
-    cursor, conn = connect()
-
-    retrieve_fire_alerts()
-    retrieve_fall_alerts()
-    retrieve_robbery_alerts()
-    conn.close()
-
-# storeFireAlertData("{20:20:20}", "{link}", True)
-# storeMouvementAlertData("{20:20:20}", "{link}", True)
-
+    retrieve_alerts("fire")
+    retrieve_alerts("fall")
+    retrieve_alerts("robbery")
+    
 def retrieve_users():
-    cursor, conn = connect()
 
-    query = "select * from users"
-    cursor.execute(query)
+    # Establishing Connection to DB
+    with get_db_connection() as (cursor, conn):
+        try:
+            query = "select * from users"
+            cursor.execute(query)
+    
+            result = cursor.fetchall()
+            for row in result:
+                print(f"ID: {row[0]} | Username: {row[1]}")
+        except Exception as e:
+            print(f"Error retrieving users: {e}")
+        
+def remove_camera(camera_id):
 
-    result = cursor.fetchall()
-    for row in result:
-        print(f"id {row[0]} | username : {row[1]}  | password : {row[2]}")
-
-    conn.close()
-
-# add_user("user", "user")
-
-# retrieve_users()
+    with get_db_connection() as (cursor, conn):
+        
+        try:
+            query = "DELETE FROM cameras WHERE id = %s"
+            cursor.execute(query, (camera_id,))
+            conn.commit()
+            print(f"Camera with ID {camera_id} removed successfully.")
+        except Exception as e:
+            print(f"Error removing camera: {e}")
