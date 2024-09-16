@@ -10,8 +10,8 @@ from datetime import datetime
 from PySide6 import QtCore
 
 # local imports
-from DataBase import storeFireAlertData
-from cloudStorage import uploadBlob
+from DataBase import store_alert_data
+from cloudStorage import upload_blob
 from AlertAdmin import send_sms
 from multiprocess import QValkkaOpenCVProcess
 from .PersonDetector import PersonDetector
@@ -47,11 +47,6 @@ class QValkkaRobberyDetectorProcess(QValkkaOpenCVProcess):
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)  # does parameterInitCheck
         self.signals = self.Signals()
-
-        # # parameterInitCheck(QValkkaMovementDetectorProcess.parameter_defs, kwargs, self)
-        # self.analyzer=MovementDetector(verbose=True)
-        # self.analyzer = MovementDetector(treshold=0.0001)# To be changed
-
         self.personDetector = PersonDetector()
         self.RobberyDetector = load_model('/home/iheb/PycharmProjects/Vision-Alarm/MachineVision/RobberyDetection/Robbery_Detection_Model3.h5')
 
@@ -61,6 +56,14 @@ class QValkkaRobberyDetectorProcess(QValkkaOpenCVProcess):
         self.sendSignal_(name="Robbery_detected")
 
     def cycle_(self):
+        """ 
+            Cycle function will be automatically called within QValka main process and runs the expected Machine vision analyses 
+            on the passed frames.
+
+
+            If robbery detected, The frames of the incident will be stored in the cloud And the admin will be alerted through an SMS using twilio.
+
+        """
         
         if self.client is None:
             time.sleep(1.0)
@@ -105,6 +108,9 @@ class QValkkaRobberyDetectorProcess(QValkkaOpenCVProcess):
     
 
     def Robbery_detected(self):
+        """ 
+            Emits the robbery detection signal when a robbery is detected. 
+        """
         logging("At frontend: Robbery detected ")
         self.signals.Robbery_detected.emit()
 
